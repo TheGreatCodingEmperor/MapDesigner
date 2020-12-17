@@ -1,0 +1,25 @@
+:host>>>.mat-tab-group {
+    flex-direction: row;
+}
+:host>>>.mat-tab-header {
+  border-bottom: none;
+}
+:host>>>.mat-tab-header-pagination {
+    display: none !important;
+}
+:host>>>.mat-tab-labels {
+    flex-direction: column;
+}
+:host>>>.mat-ripple-element{
+  display:none;
+}
+:host>>>.mat-ink-bar {
+    height: 100%;
+    left: 98% !important;
+}
+:host>>>.mat-tab-body-wrapper {
+    flex: 1 1 auto;
+}
+input,label{
+    display: block;
+}

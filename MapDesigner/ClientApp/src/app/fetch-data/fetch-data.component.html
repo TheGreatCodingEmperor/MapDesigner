@@ -1,24 +1,46 @@
-<h1 id="tableLabel">Weather forecast</h1>
+<mat-drawer-container class="example-container">
 
-<p>This component demonstrates fetching data from the server.</p>
 
-<p *ngIf="!forecasts"><em>Loading...</em></p>
+  <mat-drawer #drawer mode="side" style="width:30%" opened>
+    <mat-tab-group animationDuration="0ms">
+      <mat-tab label="{{config.name}}" *ngFor="let config of mapSchema" [ngSwitch]="config.name">
+        <div *ngSwitchCase="'path'">
+          <label>code</label>
+          <ace-editor [(ngModel)]="config.code" style="height:150px;">
+          </ace-editor>
+        </div>
+        <div *ngFor="let attr of attrKeys(config)">
+          <label for="{{attr}}">{{attr}}</label>
+          <p *ngIf="!config.advance[attr]">
+            <input id="{{attr}}" type="text" [(ngModel)]="config.attrs[attr]">
+          </p>
+          <p *ngIf="config.advance[attr]">
+            <ace-editor [(ngModel)]="config.attrs[attr]" style="height:150px;">
+            </ace-editor>
+          </p>
+          <button (click)="config.advance[attr]=!config.advance[attr]">advance</button>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-drawer>
 
-<table class='table table-striped' aria-labelledby="tableLabel" *ngIf="forecasts">
-  <thead>
-    <tr>
-      <th>Date</th>
-      <th>Temp. (C)</th>
-      <th>Temp. (F)</th>
-      <th>Summary</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let forecast of forecasts">
-      <td>{{ forecast.date }}</td>
-      <td>{{ forecast.temperatureC }}</td>
-      <td>{{ forecast.temperatureF }}</td>
-      <td>{{ forecast.summary }}</td>
-    </tr>
-  </tbody>
-</table>
+
+  <mat-drawer-content>
+    <div class="d3-geomap" id="map"></div>
+    <mat-select [(ngModel)]="dataSet">
+      <mat-option [value]="markers">
+        markers
+      </mat-option>
+      <mat-option [value]="schools">
+        schools
+      </mat-option>
+    </mat-select>
+    <button (click)="addBubbles()">add bubbles</button>
+    <input type="text" #remove>
+    <button (click)="removeElement(remove.value)">remove</button>
+    <button (click)="rebuildMap()">rebuild</button>
+    <button mat-raised-button (click)="drawer.toggle()">Toggle drawer</button>
+    <button mat-raised-button (click)="saveSchema()">save</button>
+  </mat-drawer-content>
+
+</mat-drawer-container>

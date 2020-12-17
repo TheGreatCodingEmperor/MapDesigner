@@ -45,6 +45,7 @@ export class Rect implements IRect {
 
 export interface IBubbles {
     data: object[],
+    id:string,
     class: string,
     longLabel: string,
     latLabel: string,
@@ -61,6 +62,7 @@ export interface IBubbles {
 }
 export class Bubbles implements IBubbles {
     data: object[] = [];
+    id:string;
     class: string = "bubble";
     longLabel: string = "'long'";
     latLabel: string = "'lat'";
@@ -125,4 +127,15 @@ else{
 svg.select("#country"+i.properties.TOWNID).style("fill", "grey");
 }`;
     click: string = "null";
+}
+
+export class D3Element{
+    class:"";
+    id:"";
+    attr:{
+    };
+    style:{
+    };
+    on:{
+    };
 }
