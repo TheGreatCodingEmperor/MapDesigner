@@ -88,7 +88,7 @@ export class D3BuildHelper implements IMapBuilder {
             .on("mouseleave", (e, d) => {
                 eval(attrs.mouseleave)
             })
-            .on("click", (d, i) => {
+            .on("click", (e, d) => {
                 eval(attrs.click);
             });
         this.map[name] = element;
@@ -112,6 +112,7 @@ export class D3BuildHelper implements IMapBuilder {
             .append("path")
             .attr("d", this.map["path"])
             .attr("id", (d: any) => { return eval(attrs.id) })
+            .attr("class",(d: any)=>{ return eval(attrs.class) })
             .attr("fill", (d) => { return eval(attrs.fill) })
             .attr("stroke", (d) => { return eval(attrs.stroke) })
             .attr("stroke-width", (d) => { return eval(attrs.strokeWidth) })
@@ -124,7 +125,7 @@ export class D3BuildHelper implements IMapBuilder {
             .on("mouseleave", (e, d) => {
                 eval(attrs.mouseleave);
             })
-            .on("click", (d, i) => {
+            .on("click", (e, d) => {
                 eval(attrs.click);
             });
     }

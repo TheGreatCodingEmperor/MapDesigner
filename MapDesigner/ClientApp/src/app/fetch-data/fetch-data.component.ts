@@ -238,15 +238,19 @@ export class FetchDataComponent implements OnInit {
     {
       name: "rect",
       attrs: {
-        fill: "'white'",
+        fill: "'#0066cc'",
         stroke: "'black'",
+
+        click:`this.map['clicked'](null);this.map.svg.selectAll('.path').style('fill','rgb(221, 140, 129)');`
       },
       advance:{}
     },
     {
       type: 'path',
       name: 'path',
-      code: "data",
+      code: `data.objects.towns.geometries = data.objects.towns.geometries.filter(
+        x => x.properties.COUNTYNAME == "高雄市"
+      ); data;`,
       data: null,
       tag: 'towns',
       attrs: {
@@ -254,15 +258,22 @@ export class FetchDataComponent implements OnInit {
         class: "'path'",
         fill: "'rgb(221, 140, 129)'",
         stroke: "'white'",
-        strokeWidth: "0.25",
+        strokeWidth: "0.5",
 
-        mouseover: `this.map["tooltip"].style("opacity", 1);`,
+        mouseover: `this.map["tooltip"].style("opacity", 1);this.map.svg.select('#path' + d.properties.TOWNID).style('fill','yellow')`,
         mousemove: ` this.map["tooltip"]
         .html( d.properties.COUNTYNAME + d.properties.TOWNNAME)
         .style("left", e.pageX + 10 + "px")
         .style("top", e.pageY + "px");`,
-        mouseleave: `this.map["tooltip"].style("opacity", 0);`,
-        click: `this.map['clicked'](i);`
+        mouseleave: `
+        this.map["tooltip"].style("opacity", 0);
+        let color = 'rgb(221, 140, 129)';
+        if(this.map.centered == d)color = "#ac2b2b";
+        this.map.svg.select('#path' + d.properties.TOWNID).style('fill',color)`,
+        click: `
+        this.map['clicked'](d);
+        this.map.svg.selectAll('.path').style('fill','rgb(221, 140, 129)');
+        this.map.svg.select('#path' + d.properties.TOWNID).style('fill',"#ac2b2b")`
       },
       advance:{}
     },
@@ -379,7 +390,7 @@ export class FetchDataComponent implements OnInit {
         return eval(config.attrs.stroke);
       })
       .on("click", () => {
-        this.map['clicked'](null);
+        eval(config.attrs.click)
       });
   }
 
@@ -423,8 +434,6 @@ export class FetchDataComponent implements OnInit {
 
   buildClicked() {
     this.map['clicked'] = (d) => {
-      console.log("clicked")
-      console.log(d);
       let x, y, k;
 
       if (d && this.map["centered"] !== d) {
