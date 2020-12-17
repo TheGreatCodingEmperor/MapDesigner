@@ -1,0 +1,107 @@
+body {
+    margin: 0;
+    background-color: #2A2C39;
+    font-family: 'Yanone Kaffeesatz', sans-serif;
+    font-weight: 200;
+    font-size: 17px;
+  }
+  #map-holder {
+    width: 100vw;
+    height: 100vh;
+  }
+  svg rect {
+    fill: #2A2C39;   /* map background colour */
+  }
+  .country{
+    fill: #d0d0d0;   /* country colour */
+    stroke: #2A2C39; /* country border colour */
+    stroke-width: 1; /* country border width */
+  }
+  .country-on{
+    fill: #4B5358;   /* highlight colour for selected country */
+  }
+  .countryLabel{
+    display: none;   /* hide all country labels by default */
+  }
+  .countryName{
+    font-size: 10px;
+    display: block;
+    fill: #FFFAFF;   /* country label text colour */
+  }
+  .countryLabelBg{
+    fill: #30BCED;   /* country label background colour */
+  }
+  .countryName:hover{
+    display:block;
+  }
+  div.tooltip {
+    color: #222; 
+    background: #fff; 
+    border-radius: 3px; 
+    box-shadow: 0px 0px 2px 0px #a6a6a6; 
+    padding: .2em; 
+    text-shadow: #f5f5f5 0 1px 0;
+    opacity: 0.9; 
+    position: absolute;
+  }
+  .shadow {
+    -webkit-filter: drop-shadow( 3px 3px 2px rgba(0, 0, 0, .7));
+    filter: drop-shadow( 3px 3px 2px rgba(0, 0, 0, .7));
+    /* Similar syntax to box-shadow */
+  }
+  
+.container {
+        max-width: 1264px;
+        width: 100%;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        background: none;
+    }
+
+:host>>>.mat-tab-group {
+    flex-direction: row;
+}
+:host>>>.mat-tab-header {
+  border-bottom: none;
+}
+:host>>>.mat-tab-header-pagination {
+    display: none !important;
+}
+:host>>>.mat-tab-labels {
+    flex-direction: column;
+}
+:host>>>.mat-ripple-element{
+  display:none;
+}
+:host>>>.mat-ink-bar {
+    height: 100%;
+    left: 98% !important;
+}
+:host>>>.mat-tab-body-wrapper {
+    flex: 1 1 auto;
+}
+
+.container {
+    position: relative;
+    width: 100%;
+    flex: 1 0 auto;
+    margin: 0 auto;
+    text-align: left;
+}
+
+#content {
+    box-sizing: content-box;
+    margin: 0 auto;
+    padding: 15px;
+    width: 1264px;
+    background-color: #ffffff;
+}
+
+#content {
+    max-width: 1100px;
+    width: 100%;
+    background-color: #ffffff;
+    padding: 24px;
+    box-sizing: border-box;
+}

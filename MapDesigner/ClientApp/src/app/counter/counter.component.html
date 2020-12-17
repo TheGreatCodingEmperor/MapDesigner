@@ -1,0 +1,35 @@
+<div class="tooltip"></div>
+<div style="display: flex;">
+    <div>
+        <mat-tab-group animationDuration="0ms" style="width:600px">
+            <mat-tab label="Global">
+                <global-config [globalConfig]="globalConfig"></global-config>
+            </mat-tab>
+            <mat-tab label="SVG">
+                <svg-config [svgConfig]="svgConfig"></svg-config>
+            </mat-tab>
+            <mat-tab label="ScaleBarZoom">
+                <scale-bar-zoom-config [scaleBarZoomConfig]="scaleBarZoomConfig"></scale-bar-zoom-config>
+            </mat-tab>
+            <mat-tab label="Rect">
+                <rect-config [rectConfig]="rectConfig"></rect-config>
+            </mat-tab>
+            <mat-tab label="Bubbles">
+                <bubbles-config [bubblesConfig]="bubblesConfig"></bubbles-config>
+            </mat-tab>
+            <mat-tab label="Paths">
+                <paths-config [pathConfig]="pathConfig"></paths-config>
+            </mat-tab>
+        </mat-tab-group>
+        <button mat-button color="primary" (click)="rebuild()">rebuild</button>
+        <button (click)="exportPicture()">export</button>
+    </div>
+    <div class="d3-geomap" id="map"></div>
+    <!-- <div>
+        <a href="{{hospital.url}}">
+            <h1>{{hospital.name}}</h1>
+        </a>
+        <button id="zoom-reset-button">un zoom</button>
+        <button (click)="exportPicture()">export</button>
+    </div> -->
+</div>
