@@ -1,0 +1,22 @@
+{{data.schema | json}}
+<button mat-raised-button color="accent" (click)="addCol()">add col</button>
+<table mat-table [dataSource]="dataSource" >
+
+  <!--- Note that these columns can be defined in any order.
+        The actual rendered columns are set as a property on the row definition" -->
+
+  <!-- Position Column -->
+  <ng-container *ngFor="let head of data.schema;let i = index;trackBy:trackByFn;" matColumnDef="{{data.schema[i]}}">
+    <th mat-header-cell *matHeaderCellDef>
+      <input type="text" [(ngModel)]="data.schema[i]" autofocus>
+      <button mat-raised-button color="warn" (click)="rmCol()">rm col</button> 
+    </th>
+    <td mat-cell *matCellDef="let element"> 
+      <input type="text" [(ngModel)]="element[head]">
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="data.schema"></tr>
+  <tr mat-row *matRowDef="let row; columns: data.schema;"></tr>
+</table>
+<mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>

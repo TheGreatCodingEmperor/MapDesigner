@@ -34,213 +34,7 @@ export interface IMap {
   styleUrls: ['./fetch-data.component.css']
 })
 export class FetchDataComponent implements OnInit {
-  dataSets = [
-    {
-      name:"schools",
-      schema:['level','name','long','lat'],
-      data:[
-        {
-          level: 2,
-          long: 120.28457,
-          lat: 22.73341,
-          name: "國立高雄大學"
-        },
-        {
-          level: 2,
-          long: 120.32067,
-          lat: 22.62581,
-          name: "高雄師範大學"
-        },
-        {
-          level: 2,
-          long: 120.27246,
-          lat: 22.61298,
-          name: "海洋科大"
-        }
-      ]
-    },
-    {
-      name:"hospitals",
-      schema:['level','name','long','lat','url'],
-      data:[
-        {
-          level: 2,
-          long: 120.29715,
-          lat: 22.62767,
-          name: "高雄市立大同醫院",
-          url: "https://www.google.com/search?q=高雄市立大同醫院"
-        },
-        {
-          level: 2,
-          long: 120.34103,
-          lat: 22.62602,
-          name: "國軍高雄總醫院附設民眾診療服務處附設社區復健中心",
-          url:
-            "https://www.google.com/search?q=國軍高雄總醫院附設民眾診療服務處附設社區復健中心"
-        },
-        {
-          level: 1,
-          long: 120.3236,
-          lat: 22.62681,
-          name: "高雄市立民生醫院",
-          url: "https://www.google.com/search?q=高雄市立民生醫院"
-        },
-        {
-          level: 2,
-          long: 120.29796,
-          lat: 22.61589,
-          name: "阮綜合醫療社團法人阮綜合醫院",
-          url: "https://www.google.com/search?q=阮綜合醫療社團法人阮綜合醫院"
-        },
-        {
-          level: 1,
-          long: 120.32401,
-          lat: 22.63353,
-          name: "天主教聖功醫療財團法人聖功醫院",
-          url: "https://www.google.com/search?q=天主教聖功醫療財團法人聖功醫院"
-        },
-    
-        {
-          level: 1,
-          long: 120.29732,
-          lat: 22.61483,
-          name: "邱外科醫院",
-          url: "https://www.google.com/search?q=邱外科醫院/"
-        },
-        {
-          level: 2,
-          long: 120.29111,
-          lat: 22.65536,
-          name: "高雄市立聯合醫院",
-          url: "https://www.google.com/search?q=高雄市立聯合醫院"
-        },
-        {
-          level: 1,
-          long: 120.28503,
-          lat: 22.59038,
-          name: "高雄市立旗津醫院",
-          url: "https://www.google.com/search?q=高雄市立旗津醫院"
-        },
-        {
-          level: 3,
-          long: 120.30964,
-          lat: 22.64617,
-          name: "財團法人私立高雄醫學大學附設中和紀念醫院",
-          url:
-            "https://www.google.com/search?q=財團法人私立高雄醫學大學附設中和紀念醫院"
-        },
-        {
-          level: 1,
-          long: 120.32898,
-          lat: 22.7238,
-          name: "健仁醫院",
-          url: "https://www.google.com/search?q=健仁醫院"
-        },
-    
-        {
-          level: 2,
-          long: 120.36336,
-          lat: 22.56758,
-          name: "高雄市立小港醫院",
-          url: "https://www.google.com/search?q=高雄市立小港醫院"
-        },
-        {
-          level: 2,
-          long: 120.29111,
-          lat: 22.7022,
-          name: "國軍高雄總醫院左營分院",
-          url: "https://www.google.com/search?q=國軍高雄總醫院左營分院"
-        },
-        {
-          level: 3,
-          long: 120.323,
-          lat: 22.67755,
-          name: "高雄榮民總醫院",
-          url: "https://www.google.com/search?q=高雄榮民總醫院"
-        },
-        {
-          level: 1,
-          long: 120.28566,
-          lat: 22.78965,
-          name: "國軍高雄總醫院岡山分院附設民眾診療服務處",
-          url:
-            "https://www.google.com/search?q=國軍高雄總醫院岡山分院附設民眾診療服務處"
-        },
-        {
-          level: 1,
-          long: 120.29453,
-          lat: 22.79699,
-          name: "高雄市立岡山醫院",
-          url: "https://www.google.com/search?q=高雄市立岡山醫院"
-        },
-    
-        {
-          level: 3,
-          long: 120.36444,
-          lat: 22.76609,
-          name: "義大醫療財團法人義大醫院",
-          url: "https://www.google.com/search?q=義大醫療財團法人義大醫院"
-        },
-        {
-          level: 1,
-          long: 120.36544,
-          lat: 22.76626,
-          name: "義大醫療財團法人義大癌治療醫院",
-          url: "https://www.google.com/search?q=義大醫療財團法人義大癌治療醫院"
-        },
-        {
-          level: 1,
-          long: 120.36304,
-          lat: 22.62869,
-          name: "高雄市立鳳山醫院",
-          url: "https://www.google.com/search?q=高雄市立鳳山醫院"
-        },
-        {
-          level: 1,
-          long: 120.36192,
-          lat: 22.62552,
-          name: "大東醫院",
-          url: "https://www.google.com/search?q=大東醫院"
-        },
-        {
-          level: 1,
-          long: 120.33567,
-          lat: 22.59779,
-          name: "杏和醫院",
-          url: "https://www.google.com/search?q=杏和醫院"
-        },
-    
-        {
-          level: 1,
-          long: 120.38488,
-          lat: 22.61787,
-          name: "瑞生醫院",
-          url: "https://www.google.com/search?q=瑞生醫院"
-        },
-        {
-          level: 1,
-          long: 120.3867,
-          lat: 22.50382,
-          name: "建佑醫院",
-          url: "https://www.google.com/search?q=建佑醫院"
-        },
-        {
-          level: 3,
-          long: 120.3528,
-          lat: 22.64949,
-          name: "長庚醫療財團法人高雄長庚紀念醫院",
-          url: "https://www.google.com/search?q=長庚醫療財團法人高雄長庚紀念醫院"
-        },
-        {
-          level: 2,
-          long: 120.48333,
-          lat: 22.88067,
-          name: "衛生福利部旗山醫院",
-          url: "https://www.google.com/search?q=衛生福利部旗山醫院"
-        }
-      ]
-    }
-  ]
+  dataSets = [];
 
   private mapBuilder = new D3BuildHelper;
   map = {};
@@ -284,7 +78,7 @@ export class FetchDataComponent implements OnInit {
       code: `data.objects.towns.geometries = data.objects.towns.geometries.filter(
         x => x.properties.COUNTYNAME == "高雄市"
       ); data;`,
-      data: null,
+      data: 'villages',
       tag: 'towns',
       attrs: {
         id: "'path' + d.properties.TOWNID",
@@ -378,11 +172,17 @@ export class FetchDataComponent implements OnInit {
     this.mapBuilder.dataSets = this.dataSets;
     // this.mapBuilder.width = this.width;
     // this.mapBuilder.height = this.height;
-    this.http.get("assets/villages-10t.json").subscribe((data: any) => {
-      console.log(data);
-      path.data = data;
+    this.http.get("https://localhost:5001/DataSet").subscribe((res:any[])=>{
+      this.dataSets = res.map(x =>{ return {name:x.Name,schema:x.Schema,data:JSON.parse(x.Data)}});
+      this.mapBuilder.dataSets = this.dataSets;
+      path.data = "";
       this.rebuildMap();
-    })
+    });
+    // this.http.get("assets/villages-10t.json").subscribe((data: any) => {
+    //   console.log(data);
+    //   path.data = data;
+    //   this.rebuildMap();
+    // })
 
   }
 
@@ -415,8 +215,8 @@ export class FetchDataComponent implements OnInit {
     }
   }
 
-  addBubbles(name: string, parent: string, selectAll: string, data: string, elementType: string, attrs: any) {
-    this.mapBuilder.dataSetBuildElements(name, parent, selectAll, data, elementType, attrs);
+  addBubbles(name: string, parent: string, selectAll: string, dataTag: string, elementType: string, attrs: any) {
+    this.mapBuilder.dataSetBuildElements(name, parent, selectAll, dataTag, elementType, attrs);
   }
 
   buildProjection() {
@@ -477,7 +277,8 @@ export class FetchDataComponent implements OnInit {
     //   // ); data;`
     //   this.mapBuilder.buildPath(this.pathCondition, data, null);
     // });
-    this.mapBuilder.buildPath(config.code, config.data, config.tag, config.attrs);
+    let data = this.dataSets.find(x => x.name == "villages").data;
+    this.mapBuilder.buildPath(config.code, data, config.tag, config.attrs);
   }
 
   buildPathGruop() {

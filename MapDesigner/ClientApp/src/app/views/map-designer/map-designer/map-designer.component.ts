@@ -4,6 +4,8 @@ import * as d3 from "d3";
 import * as t from "topojson";
 import * as d3GeoBar from "d3-geo-scale-bar";
 import { D3BuildHelper } from 'src/app/helpers/d3-build-helper';
+import { MatDialog } from '@angular/material/dialog';
+import { DataEditorComponent } from '../components/data-editor/data-editor.component';
 
 
 @Component({
@@ -12,362 +14,59 @@ import { D3BuildHelper } from 'src/app/helpers/d3-build-helper';
   styleUrls: ['./map-designer.component.css']
 })
 export class MapDesignerComponent implements OnInit {
-  dataSets = [
-    {
-      name:"schools",
-      schema:['level','name','long','lat'],
-      data:[
-        {
-          level: 2,
-          long: 120.28457,
-          lat: 22.73341,
-          name: "國立高雄大學"
-        },
-        {
-          level: 2,
-          long: 120.32067,
-          lat: 22.62581,
-          name: "高雄師範大學"
-        },
-        {
-          level: 2,
-          long: 120.27246,
-          lat: 22.61298,
-          name: "海洋科大"
-        }
-      ]
-    },
-    {
-      name:"hospitals",
-      schema:['level','name','long','lat','url'],
-      data:[
-        {
-          level: 2,
-          long: 120.29715,
-          lat: 22.62767,
-          name: "高雄市立大同醫院",
-          url: "https://www.google.com/search?q=高雄市立大同醫院"
-        },
-        {
-          level: 2,
-          long: 120.34103,
-          lat: 22.62602,
-          name: "國軍高雄總醫院附設民眾診療服務處附設社區復健中心",
-          url:
-            "https://www.google.com/search?q=國軍高雄總醫院附設民眾診療服務處附設社區復健中心"
-        },
-        {
-          level: 1,
-          long: 120.3236,
-          lat: 22.62681,
-          name: "高雄市立民生醫院",
-          url: "https://www.google.com/search?q=高雄市立民生醫院"
-        },
-        {
-          level: 2,
-          long: 120.29796,
-          lat: 22.61589,
-          name: "阮綜合醫療社團法人阮綜合醫院",
-          url: "https://www.google.com/search?q=阮綜合醫療社團法人阮綜合醫院"
-        },
-        {
-          level: 1,
-          long: 120.32401,
-          lat: 22.63353,
-          name: "天主教聖功醫療財團法人聖功醫院",
-          url: "https://www.google.com/search?q=天主教聖功醫療財團法人聖功醫院"
-        },
-    
-        {
-          level: 1,
-          long: 120.29732,
-          lat: 22.61483,
-          name: "邱外科醫院",
-          url: "https://www.google.com/search?q=邱外科醫院/"
-        },
-        {
-          level: 2,
-          long: 120.29111,
-          lat: 22.65536,
-          name: "高雄市立聯合醫院",
-          url: "https://www.google.com/search?q=高雄市立聯合醫院"
-        },
-        {
-          level: 1,
-          long: 120.28503,
-          lat: 22.59038,
-          name: "高雄市立旗津醫院",
-          url: "https://www.google.com/search?q=高雄市立旗津醫院"
-        },
-        {
-          level: 3,
-          long: 120.30964,
-          lat: 22.64617,
-          name: "財團法人私立高雄醫學大學附設中和紀念醫院",
-          url:
-            "https://www.google.com/search?q=財團法人私立高雄醫學大學附設中和紀念醫院"
-        },
-        {
-          level: 1,
-          long: 120.32898,
-          lat: 22.7238,
-          name: "健仁醫院",
-          url: "https://www.google.com/search?q=健仁醫院"
-        },
-    
-        {
-          level: 2,
-          long: 120.36336,
-          lat: 22.56758,
-          name: "高雄市立小港醫院",
-          url: "https://www.google.com/search?q=高雄市立小港醫院"
-        },
-        {
-          level: 2,
-          long: 120.29111,
-          lat: 22.7022,
-          name: "國軍高雄總醫院左營分院",
-          url: "https://www.google.com/search?q=國軍高雄總醫院左營分院"
-        },
-        {
-          level: 3,
-          long: 120.323,
-          lat: 22.67755,
-          name: "高雄榮民總醫院",
-          url: "https://www.google.com/search?q=高雄榮民總醫院"
-        },
-        {
-          level: 1,
-          long: 120.28566,
-          lat: 22.78965,
-          name: "國軍高雄總醫院岡山分院附設民眾診療服務處",
-          url:
-            "https://www.google.com/search?q=國軍高雄總醫院岡山分院附設民眾診療服務處"
-        },
-        {
-          level: 1,
-          long: 120.29453,
-          lat: 22.79699,
-          name: "高雄市立岡山醫院",
-          url: "https://www.google.com/search?q=高雄市立岡山醫院"
-        },
-    
-        {
-          level: 3,
-          long: 120.36444,
-          lat: 22.76609,
-          name: "義大醫療財團法人義大醫院",
-          url: "https://www.google.com/search?q=義大醫療財團法人義大醫院"
-        },
-        {
-          level: 1,
-          long: 120.36544,
-          lat: 22.76626,
-          name: "義大醫療財團法人義大癌治療醫院",
-          url: "https://www.google.com/search?q=義大醫療財團法人義大癌治療醫院"
-        },
-        {
-          level: 1,
-          long: 120.36304,
-          lat: 22.62869,
-          name: "高雄市立鳳山醫院",
-          url: "https://www.google.com/search?q=高雄市立鳳山醫院"
-        },
-        {
-          level: 1,
-          long: 120.36192,
-          lat: 22.62552,
-          name: "大東醫院",
-          url: "https://www.google.com/search?q=大東醫院"
-        },
-        {
-          level: 1,
-          long: 120.33567,
-          lat: 22.59779,
-          name: "杏和醫院",
-          url: "https://www.google.com/search?q=杏和醫院"
-        },
-    
-        {
-          level: 1,
-          long: 120.38488,
-          lat: 22.61787,
-          name: "瑞生醫院",
-          url: "https://www.google.com/search?q=瑞生醫院"
-        },
-        {
-          level: 1,
-          long: 120.3867,
-          lat: 22.50382,
-          name: "建佑醫院",
-          url: "https://www.google.com/search?q=建佑醫院"
-        },
-        {
-          level: 3,
-          long: 120.3528,
-          lat: 22.64949,
-          name: "長庚醫療財團法人高雄長庚紀念醫院",
-          url: "https://www.google.com/search?q=長庚醫療財團法人高雄長庚紀念醫院"
-        },
-        {
-          level: 2,
-          long: 120.48333,
-          lat: 22.88067,
-          name: "衛生福利部旗山醫院",
-          url: "https://www.google.com/search?q=衛生福利部旗山醫院"
-        }
-      ]
-    }
-  ]
 
   private mapBuilder = new D3BuildHelper;
   map = {};
   k = 3;
   width = 900;
   height = 700;
-  dataSet = null;
-  pathCondition = "data";
-  mapSchema = [
-    {
-      name: 'projection',
-      attrs: {
-        centerLong: 120.31041,
-        centerLat: 22.64889,
-        scale: 30000,
-        translateX: 200,
-        translateY: 500,
-      },
-      advance: {}
-    },
-    {
-      name: 'svg',
-      attrs: {
-        fill: "'grey'",
-      },
-      advance: {}
-    },
-    {
-      name: "rect",
-      attrs: {
-        fill: "'#0066cc'",
-        stroke: "'black'",
-
-        click: `this.map['clicked'](null);this.map.svg.selectAll('.path').style('fill','rgb(221, 140, 129)');`
-      },
-      advance: {}
-    },
-    {
-      type: 'path',
-      name: 'path',
-      code: `data.objects.towns.geometries = data.objects.towns.geometries.filter(
-        x => x.properties.COUNTYNAME == "高雄市"
-      ); data;`,
-      data: null,
-      tag: 'towns',
-      attrs: {
-        id: "'path' + d.properties.TOWNID",
-        class: "'path'",
-        fill: "'rgb(221, 140, 129)'",
-        stroke: "'white'",
-        strokeWidth: "0.5",
-
-        mouseover: `this.map["tooltip"].style("opacity", 1);this.map.svg.select('#path' + d.properties.TOWNID).style('fill','yellow')`,
-        mousemove: ` this.map["tooltip"]
-        .html( d.properties.COUNTYNAME + d.properties.TOWNNAME)
-        .style("left", e.pageX + 10 + "px")
-        .style("top", e.pageY + "px");`,
-        mouseleave: `
-        this.map["tooltip"].style("opacity", 0);
-        let color = 'rgb(221, 140, 129)';
-        if(this.map.centered == d)color = "#ac2b2b";
-        this.map.svg.select('#path' + d.properties.TOWNID).style('fill',color)`,
-        click: `
-        this.map['clicked'](d);
-        this.map.svg.selectAll('.path').style('fill','rgb(221, 140, 129)');
-        this.map.svg.select('#path' + this.map.centered.properties.TOWNID).style('fill',"#ac2b2b")`
-      },
-      advance: {}
-    },
-    {
-      name: 'scaleBarZoom',
-      attrs: {
-        left: 0.85,
-        top: 0.05,
-      },
-      advance: {}
-    },
-    {
-      type: 'bubble',
-      name: 'markers',
-      data: 'schools',
-      attrs: {
-        cx: `this.map["projection"]([d.long, d.lat])[0]; //座標轉 xy 軸 x`,
-        cy: `this.map["projection"]([d.long, d.lat])[1]; //座標轉 xy 軸 y`,
-        r: `5`,
-        stroke: `'#69b3a2'`,
-        strokeWidth: `1`,
-        fillOpacity: `1`,
-        fill: `'red'`,
-
-        mouseover: `this.map["tooltip"].style("opacity", 1);`,
-        mousemove: ` this.map["tooltip"]
-        .html(d.name)
-        .style("left", e.pageX + 10 + "px")
-        .style("top", e.pageY + "px");`,
-        mouseleave: `this.map["tooltip"].style("opacity", 0);`,
-        click: ``
-      },
-      advance: {}
-    },
-    {
-      type: 'bubble',
-      name: 'school',
-      data: 'hospitals',
-      attrs: {
-        cx: `this.map["projection"]([d.long, d.lat])[0]; //座標轉 xy 軸 x`,
-        cy: `this.map["projection"]([d.long, d.lat])[1]; //座標轉 xy 軸 y`,
-        r: `5`,
-        stroke: `'#69b3a2'`,
-        strokeWidth: `1`,
-        fillOpacity: `1`,
-        fill: `'green'`,
-
-        mouseover: `this.map["tooltip"].style("opacity", 1);`,
-        mousemove: ` this.map["tooltip"]
-        .html(d.name)
-        .style("left", e.pageX + 10 + "px")
-        .style("top", e.pageY + "px");`,
-        mouseleave: `this.map["tooltip"].style("opacity", 0);`,
-        click: ``
-      },
-      advance: {}
-    }
-  ];
+  mapSchema = [];
+  dataSets = [];
 
   constructor(
     private http: HttpClient,
+    public dialog: MatDialog
   ) {
 
   }
 
   ngOnInit() {
     var path = this.mapSchema.find(x => x.type == "path");
-    this.mapBuilder.map = this.map;
-    this.mapBuilder.dataSets = this.dataSets;
-    // this.mapBuilder.width = this.width;
-    // this.mapBuilder.height = this.height;
-    this.http.get("assets/villages-10t.json").subscribe((data: any) => {
-      console.log(data);
-      path.data = data;
+    this.http.get("https://localhost:5001/MapSchema/MapDesigner/1").subscribe((res:any)=>{
+      try{
+        this.mapSchema = JSON.parse(res.MapSchema.Schema);
+      }
+      catch{
+        alert("map schema error!");
+      }
+      
+      this.dataSets = res.DataSets.map(x =>{ 
+        let data:any[] = [];
+        try{
+          data = JSON.parse(x.Data);
+        }
+        catch{
+          alert(`data ${x.Name} error!`);
+        }
+        return {
+          DataSetId:x.DataSetId,
+          DataType:x.DataType,
+          Name:x.Name,
+          name:x.Name,
+          schema:x.Schema?x.Schema.split(','):null,
+          data:data
+        }
+      });
+      this.mapBuilder.map = this.map;
+      this.mapBuilder.dataSets = this.dataSets;
       this.rebuildMap();
-    })
-
+    });
   }
 
   rebuildMap() {
     if (d3.select("#svgmap")) {
+      this.k = 3;
       d3.select("#svgmap").remove();
-
     }
     this.buildTooltip();
 
@@ -389,11 +88,17 @@ export class MapDesignerComponent implements OnInit {
 
     let bubbles = this.mapSchema.filter(x => x.type == 'bubble');
     for (let bubble of bubbles) {
-      this.addBubbles(bubble.name, null, "myCircles", bubble.data, "circle", bubble.attrs);
+      let data = [];
+      try{
+        data = this.dataSets.find(x=> x.DataSetId == bubble.DataSetId).data;
+      }catch{
+        alert(`not found DataSetId#{DataSetId}`)
+      }
+      this.addBubbles(bubble.name, null, "myCircles", data, "circle", bubble.attrs);
     }
   }
 
-  addBubbles(name: string, parent: string, selectAll: string, data: string, elementType: string, attrs: any) {
+  addBubbles(name: string, parent: string, selectAll: string, data: any[], elementType: string, attrs: any) {
     this.mapBuilder.dataSetBuildElements(name, parent, selectAll, data, elementType, attrs);
   }
 
@@ -455,7 +160,8 @@ export class MapDesignerComponent implements OnInit {
     //   // ); data;`
     //   this.mapBuilder.buildPath(this.pathCondition, data, null);
     // });
-    this.mapBuilder.buildPath(config.code, config.data, config.tag, config.attrs);
+    let data = this.dataSets.find(x => x.name == "villages").data;
+    this.mapBuilder.buildPath(config.code, data, config.tag, config.attrs);
   }
 
   buildPathGruop() {
@@ -520,7 +226,7 @@ export class MapDesignerComponent implements OnInit {
             "translate(" + this.width / 2 + "," + this.height / 2 +
             ")scale(" + this.k + ")translate(" + -x + "," + -y + ")"
           )
-          .style("stroke-width", 1 + "px");
+          .style("stroke-width", bubble.attrs.strokeWidth + "px");
       }
     };
   }
@@ -558,6 +264,17 @@ export class MapDesignerComponent implements OnInit {
     this.http.patch("https://localhost:5001/WeatherForecast/SaveMap", { Id: 1, Name: 'Demo', Schema: JSON.stringify(this.mapSchema) }, {}).subscribe(res => {
       console.log(res)
     });
+    let dataSets = this.dataSets.filter(x => x.DataType!=1);
+    console.log(dataSets)
+    for(let data of dataSets){
+      let save:any = {};
+      save.DataSetId = data.DataSetId;
+      save.DataType = data.DataType;
+      save.Name = data.name;
+      save.Schema = data.schema.join(',');
+      save.Data = JSON.stringify(data.data);
+      this.http.patch("https://localhost:5001/DataSet",save).subscribe(res=>{},error=>{});
+    }
   }
 
   centerScale(k: number) {
@@ -594,25 +311,37 @@ export class MapDesignerComponent implements OnInit {
           "translate(" + this.width / 2 + "," + this.height / 2 +
           ")scale(" + this.k + ")translate(" + -x + "," + -y + ")"
         )
-        .style("stroke-width", 1 + "px").attr("r", 3);
+        .style("stroke-width", bubble.attrs.strokeWidth + "px").attr("r", 3);
     }
   }
 
   buildZoomBtn() {
     d3.select("#zoom_in").on("click",()=>{
       if (this.k <= 10) {
-        this.k++;
+        this.k+=2;
         this.centerScale(this.k);
       }
     });
     d3.select("#zoom_out").on("click",()=>{
       if (this.k > 3) {
-        this.k--;
+        this.k-=2;
         this.centerScale(this.k);
       }
     });
     d3.select("#zoom_none").on("click",()=>{
       this.map['clicked'](null);
+    });
+  }
+  openDialog(DataSetId:string|number): void {
+    let data = this.dataSets.find(x => x.DataSetId == DataSetId);
+    const dialogRef = this.dialog.open(DataEditorComponent, {
+      width: '50vw',
+      data: {schema: data.schema, data: data.data}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+      // this.table = result;
     });
   }
 }
