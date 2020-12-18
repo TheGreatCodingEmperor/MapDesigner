@@ -1,39 +1,17 @@
 import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { D3BuildHelper } from '../helpers/d3-build-helper';
 import * as d3 from "d3";
 import * as t from "topojson";
 import * as d3GeoBar from "d3-geo-scale-bar";
+import { D3BuildHelper } from 'src/app/helpers/d3-build-helper';
 
-export interface IMap {
-  /** @summary 增加圓點 */
-  addBubbles: (name: string, parent: string, selectAll: string, data: any[], elementType: string, attrs: any) => {};
-  /** @summary 投影點(座標+平移) */
-  buildProjection: () => {};
-  /** @summary SVG Element */
-  buildSvg: () => {};
-  /** @summary SVG 背景(除陸地外) */
-  buildRect: () => {};
-  /** @summary 陸地個區塊+外部邊線 */
-  buildPathElement: () => {};
-  /** @summary 陸地個區塊容器*/
-  buildPathGruop: () => {};
-  /** @summary 比例尺 */
-  buildScaleBar: () => {};
-  /** @summary 點擊觸發 */
-  buildClicked: () => {};
-  /** @summary pop up 文字 */
-  buildTooltip: () => {};
-  /** @summary 建立map */
-  rebuildMap: () => {};
-}
 
 @Component({
-  selector: 'app-fetch-data',
-  templateUrl: './fetch-data.component.html',
-  styleUrls: ['./fetch-data.component.css']
+  selector: 'app-map-designer',
+  templateUrl: './map-designer.component.html',
+  styleUrls: ['./map-designer.component.css']
 })
-export class FetchDataComponent implements OnInit {
+export class MapDesignerComponent implements OnInit {
   dataSets = [
     {
       name:"schools",

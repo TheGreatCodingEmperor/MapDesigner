@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -17,11 +18,12 @@ namespace MapDesigner {
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices (IServiceCollection services) {
+            string migrationsAssembly = typeof (Startup).GetTypeInfo ().Assembly.GetName ().Name; //UltraApp
             services.AddControllersWithViews ();
             services.AddSwaggerGen ();
 
             services.AddDbContext<MapDesignerContext> (options =>
-                options.UseInMemoryDatabase (databaseName: "BoardGames")
+                options.UseMySql (Configuration["ConnectionString:Maria"],sql => sql.MigrationsAssembly (migrationsAssembly))
             );
 
             // In production, the Angular files will be served from this directory

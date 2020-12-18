@@ -24,7 +24,7 @@ export interface IMapBuilder {
      * @param elementType append element type
      * @param attrs element 內容參數
      */
-    dataSetBuildElements(name: string, parent: string, selectAll: string, data: any[], elementType: string, attrs: object): any;
+    dataSetBuildElements(name: string, parent: string, selectAll: string, data: string, elementType: string, attrs: object): any;
     /**
      * @summary foreach data 執行 action
      * @param parent select節點 ex:map["key"]
@@ -57,13 +57,14 @@ export class D3BuildHelper implements IMapBuilder {
     width = 900;
     height = 600;
     public map = {};
-    dataSetBuildElements(name: string, parent: string, selectAll: string, data: any[], elementType: string, attrs: any) {
+    public dataSets = [];
+    dataSetBuildElements(name: string, parent: string, selectAll: string, data: string, elementType: string, attrs: any) {
         var element = this.map["svg"];
         if (parent) {
             element = this.map[parent];
         }
         element = element.selectAll(selectAll)
-            .data(data)
+            .data(this.dataSets.find(x => x.name == data).data)
             .enter()
             .append(elementType)
             // .attr("class", (d) => { return eval(attrs.class) })

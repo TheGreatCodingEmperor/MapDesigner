@@ -17,8 +17,8 @@ import { RectConfigComponent } from './config-bar/rect-config/rect-config.compon
 import { BubblesConfigComponent } from './config-bar/bubbles-config/bubbles-config.component';
 import { PathsConfigComponent } from './config-bar/paths-config/paths-config.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { AceEditorComponent, AceEditorModule } from 'ng2-ace-editor';
-
+import { AceEditorModule } from 'ng2-ace-editor';
+import { MapDesignerModule } from './views/map-designer/map-designer.module';
 @NgModule({
   declarations: [
     AppComponent,
@@ -38,6 +38,7 @@ import { AceEditorComponent, AceEditorModule } from 'ng2-ace-editor';
     HttpClientModule,
     FormsModule,
     MaterialModule,
+    MapDesignerModule,
     AceEditorModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
