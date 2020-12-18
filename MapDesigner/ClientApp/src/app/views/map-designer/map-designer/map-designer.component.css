@@ -23,3 +23,6 @@
 input,label{
     display: block;
 }
+button{
+    outline:0;
+}

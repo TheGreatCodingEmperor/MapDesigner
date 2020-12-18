@@ -47,19 +47,37 @@ namespace MapDesigner.Controllers {
         [HttpGet ("MapDesigner/{Id}")]
         public async Task<IActionResult> GetFullSchemaAPI ([FromRoute] int Id) {
             var dbSet = _mapContext.Set<MapSchema> ().SingleOrDefault (x => x.Id == Id);
-            var datas = _mapContext.MapDatas.Where(x => x.MapId == Id).AsNoTracking().Select(x => x.DataSetId).ToArray();
-            var dataSets = _mapContext.DataSet.Where(x => datas.Contains(x.DataSetId)).AsNoTracking().ToList();
+            var datas = _mapContext.MapDatas.Where (x => x.MapId == Id).AsNoTracking ().Select (x => x.DataSetId).ToArray ();
+            var dataSets = _mapContext.DataSet.Where (x => datas.Contains (x.DataSetId)).AsNoTracking ().ToList ();
             await Task.CompletedTask;
-            return Ok (JsonConvert.SerializeObject (new { MapSchema=dbSet,DataSets=dataSets }, Formatting.Indented));
+            return Ok (JsonConvert.SerializeObject (new { MapSchema = dbSet, DataSets = dataSets }, Formatting.Indented));
         }
 
-        [HttpGet ("MapDesigner/{Id}")]
+        [HttpPatch ("MapDesigner/{Id}")]
         public async Task<IActionResult> PatchFullSchemaAPI ([FromRoute] int MapId, [FromBody] dynamic body) {
-            var dbSet = _mapContext.Set<MapSchema> ().SingleOrDefault (x => x.Id == MapId);
-            var datas = _mapContext.MapDatas.Where(x => x.MapId == MapId).AsNoTracking().Select(x => x.DataSetId).ToArray();
-            var dataSets = _mapContext.DataSet.Where(x => datas.Contains(x.DataSetId)).AsNoTracking().ToList();
+            // try {
+            //     var exist = _mapContext.Set<MapSchema> ().SingleOrDefault (x => x.Id == body["MapSchema"].Id);
+            //     if (exist == null) {
+            //         _mapContext.MapSchema.Add (body);
+            //     } else {
+            //         var newItem = DeepClone (exist, body);
+            //         _mapContext.Set<MapSchema> ().Update (newItem);
+            //     }
+            //     foreach (var dataset in body["DataSets"]) {
+            //         var existd = _mapContext.Set<DataSet> ().SingleOrDefault (x => x.DataSetId == body.DataSetId);
+            //         if (exist == null) {
+            //             _mapContext.DataSet.Add (body);
+            //         } else {
+            //             var newItem = DeepClone (exist, body);
+            //             _mapContext.Set<DataSet> ().Update (newItem);
+            //         }
+            //     }
+            //     await _mapContext.SaveChangesAsync ();
+            // } catch (Exception e) {
+            //     return BadRequest (e.ToString ());
+            // }
             await Task.CompletedTask;
-            return Ok (JsonConvert.SerializeObject (new { MapSchema=dbSet,DataSets=dataSets }, Formatting.Indented));
+            return Ok ();
         }
 
         [HttpDelete ("{Id}")]
@@ -73,7 +91,25 @@ namespace MapDesigner.Controllers {
                 return NotFound ();
             }
         }
+        // public void patchMap (MapSchema body) {
+        //     var exist = _mapContext.Set<MapSchema> ().SingleOrDefault (x => x.Id == body.Id);
+        //     if (exist == null) {
+        //         _mapContext.MapSchema.Add (body);
+        //     } else {
+        //         var newItem = DeepClone (exist, body);
+        //         _mapContext.Set<MapSchema> ().Update (newItem);
+        //     }
+        // }
 
+        // public void patchData (DataSet body) {
+        //     var exist = _mapContext.Set<DataSet> ().SingleOrDefault (x => x.DataSetId == body.DataSetId);
+        //     if (exist == null) {
+        //         _mapContext.DataSet.Add (body);
+        //     } else {
+        //         var newItem = DeepClone (exist, body);
+        //         _mapContext.Set<DataSet> ().Update (newItem);
+        //     }
+        // }
         public T DeepClone<T> (T res, T newT) {
             var properties = typeof (T).GetProperties ();
             foreach (var property in properties) {

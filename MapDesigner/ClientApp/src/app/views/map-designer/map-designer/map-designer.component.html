@@ -1,6 +1,6 @@
 <mat-drawer-container fxLayout="row">
 
-  <mat-drawer #drawer mode="side" fxFlex="30%" opened>
+  <mat-drawer #drawer mode="side" fxFlex="30%">
     <mat-tab-group animationDuration="0ms">
       <mat-tab label="{{config.name}}" *ngFor="let config of mapSchema" [ngSwitch]="config.type">
         <div *ngSwitchCase="'path'">
@@ -29,14 +29,19 @@
   </mat-drawer>
 
 
-  <mat-drawer-content fxFlex="70%">
+  <mat-drawer-content fxFlex="70%" style="position: relative;">
     <div class="d3-geomap" id="map" style="position: relative;">
       <div style="position: absolute;z-index:2;">
-        <button id="zoom_in">+</button>
-        <button id="zoom_out">-</button>
-        <button id="zoom_none">home</button>
+        <button mat-mini-fab id="zoom_in" aria-label="Example icon button with a heart icon">
+          <mat-icon mat-mini-fab>add</mat-icon>
+        </button>
+        <button mat-mini-fab id="zoom_out" aria-label="Example icon button with a heart icon">
+          <mat-icon mat-mini-fab>remove</mat-icon>
+        </button>
+        <button mat-mini-fab id="zoom_none" aria-label="Example icon button with a heart icon">
+          <mat-icon mat-mini-fab>home</mat-icon>
+        </button>
       </div>
-
     </div>
     <!-- <input type="text" #remove>
     <button (click)="removeElement(remove.value)">remove</button> -->

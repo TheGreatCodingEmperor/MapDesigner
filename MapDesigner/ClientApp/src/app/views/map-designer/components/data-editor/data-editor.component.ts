@@ -34,7 +34,7 @@ export class DataEditorComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
+    // this.dataSource.paginator = this.paginator;
   }
 
   onNoClick(): void {
@@ -49,8 +49,9 @@ export class DataEditorComponent implements AfterViewInit {
     this.data.schema.splice(index,1);
   }
 
-  trackByFn(index: any, item: any) {
-    return index;
- }
+  onSearchChange(searchValue: string,index:number): void {  
+    console.log(searchValue);
+    this.data.schema[index] = searchValue
+  }
 
 }

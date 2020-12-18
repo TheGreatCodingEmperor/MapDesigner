@@ -14,12 +14,23 @@ import { DataEditorComponent } from '../components/data-editor/data-editor.compo
   styleUrls: ['./map-designer.component.css']
 })
 export class MapDesignerComponent implements OnInit {
+  public baseUrl() {
+    let base = '';
+
+    if (window.location.origin) {
+      base = window.location.origin;
+    } else {
+      base = window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
+    }
+
+    return base.replace(/\/$/, '');
+  }
 
   private mapBuilder = new D3BuildHelper;
   map = {};
   k = 3;
-  width = 900;
-  height = 700;
+  width = document.querySelector(".container").clientWidth;
+  height =  window.innerHeight*0.7;
   mapSchema = [];
   dataSets = [];
 
@@ -31,8 +42,12 @@ export class MapDesignerComponent implements OnInit {
   }
 
   ngOnInit() {
+    let width = document.querySelector(".container").clientWidth;
+    this.width = width<700?width:700;
+    let height = window.innerHeight;
+    this.height = height*0.7<600?600:height*0.7;
     var path = this.mapSchema.find(x => x.type == "path");
-    this.http.get("https://localhost:5001/MapSchema/MapDesigner/1").subscribe((res:any)=>{
+    this.http.get(`${this.baseUrl()}/MapSchema/MapDesigner/1`).subscribe((res:any)=>{
       try{
         this.mapSchema = JSON.parse(res.MapSchema.Schema);
       }
@@ -191,7 +206,7 @@ export class MapDesignerComponent implements OnInit {
 
       if (d && this.map["centered"] !== d) {
         if (this.k < 3) this.k = 3;
-        console.log(this.map["path"].centroid(d))
+        // console.log(this.map["path"].centroid(d))
         //中心點相同或空白處(無geo item)
         var centroid = this.map["path"].centroid(d);
         x = centroid[0]; //緯度轉x
@@ -261,7 +276,8 @@ export class MapDesignerComponent implements OnInit {
   }
 
   saveSchema() {
-    this.http.patch("https://localhost:5001/WeatherForecast/SaveMap", { Id: 1, Name: 'Demo', Schema: JSON.stringify(this.mapSchema) }, {}).subscribe(res => {
+    let body = {};
+    this.http.patch(`${this.baseUrl()}/MapSchema`, { Id: 1, Name: 'Demo', Schema: JSON.stringify(this.mapSchema) }, {}).subscribe(res => {
       console.log(res)
     });
     let dataSets = this.dataSets.filter(x => x.DataType!=1);
@@ -273,7 +289,7 @@ export class MapDesignerComponent implements OnInit {
       save.Name = data.name;
       save.Schema = data.schema.join(',');
       save.Data = JSON.stringify(data.data);
-      this.http.patch("https://localhost:5001/DataSet",save).subscribe(res=>{},error=>{});
+      this.http.patch(`${this.baseUrl()}/DataSet`,save).subscribe(res=>{},error=>{});
     }
   }
 
@@ -282,7 +298,7 @@ export class MapDesignerComponent implements OnInit {
     let x, y;
 
     if (d) {
-      console.log(this.map["path"].centroid(d))
+      // console.log(this.map["path"].centroid(d))
       //中心點相同或空白處(無geo item)
       var centroid = this.map["path"].centroid(d);
       x = centroid[0]; //緯度轉x

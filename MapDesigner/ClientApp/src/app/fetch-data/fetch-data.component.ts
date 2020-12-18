@@ -211,11 +211,12 @@ export class FetchDataComponent implements OnInit {
 
     let bubbles = this.mapSchema.filter(x => x.type == 'bubble');
     for (let bubble of bubbles) {
-      this.addBubbles(bubble.name, null, "myCircles", bubble.data, "circle", bubble.attrs);
+      let data = this.dataSets.find(x => bubble.data == x.name).data;
+      this.addBubbles(bubble.name, null, "myCircles", data, "circle", bubble.attrs);
     }
   }
 
-  addBubbles(name: string, parent: string, selectAll: string, dataTag: string, elementType: string, attrs: any) {
+  addBubbles(name: string, parent: string, selectAll: string, dataTag: any[], elementType: string, attrs: any) {
     this.mapBuilder.dataSetBuildElements(name, parent, selectAll, dataTag, elementType, attrs);
   }
 
