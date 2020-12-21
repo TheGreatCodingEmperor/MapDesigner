@@ -21,37 +21,49 @@
             <mat-icon matTooltip="進階邏輯" (click)="config.advance[attr]=!config.advance[attr]" matSuffix>code</mat-icon>
           </mat-form-field>
           <p *ngIf="config.advance[attr]">
-            <label>{{attr}}<mat-icon matTooltip="常數設定" style="float: right;" (click)="config.advance[attr]=!config.advance[attr]">code</mat-icon></label>
+            <label>{{attr}}<mat-icon matTooltip="常數設定" style="float: right;"
+                (click)="config.advance[attr]=!config.advance[attr]">code</mat-icon></label>
             <ace-editor [(ngModel)]="config.attrs[attr]" style="height:150px;">
             </ace-editor>
           </p>
-
         </div>
       </mat-tab>
     </mat-tab-group>
-    <button mat-raised-button color="primary" (click)="rebuildMap()">rebuild</button>
-    <button mat-raised-button color="primary" (click)="drawer.toggle()">Toggle drawer</button>
+    <div style="position: absolute;bottom: 0px;z-index: 2;">
+      <button mat-raised-button color="accent" (click)="rebuildMap()">
+        <mat-icon matTooltip="rebuild">refresh</mat-icon>
+      </button>
+      <button mat-raised-button color="primary" matTooltip="close" (click)="drawer.toggle()">
+        <mat-icon>keyboard_arrow_left</mat-icon>
+      </button>
+    </div>
   </mat-drawer>
 
 
   <mat-drawer-content fxFlex="70%" style="position: relative;">
     <div class="d3-geomap" id="map" style="position: relative;">
       <div style="position: absolute;z-index:2;">
-        <button mat-mini-fab id="zoom_in" style="border-radius: 10px;" aria-label="Example icon button with a heart icon">
+        <button mat-mini-fab id="zoom_in" style="border-radius: 10px;"
+          aria-label="Example icon button with a heart icon">
           <mat-icon mat-mini-fab>add</mat-icon>
         </button>
-        <button mat-mini-fab id="zoom_out" style="border-radius: 10px;" aria-label="Example icon button with a heart icon">
+        <button mat-mini-fab id="zoom_out" style="border-radius: 10px;"
+          aria-label="Example icon button with a heart icon">
           <mat-icon mat-mini-fab>remove</mat-icon>
         </button>
-        <button mat-mini-fab id="zoom_none" style="border-radius: 10px;" aria-label="Example icon button with a heart icon">
+        <button mat-mini-fab id="zoom_none" style="border-radius: 10px;"
+          aria-label="Example icon button with a heart icon">
           <mat-icon mat-mini-fab>home</mat-icon>
         </button>
       </div>
     </div>
     <!-- <input type="text" #remove>
     <button (click)="removeElement(remove.value)">remove</button> -->
-    <button mat-raised-button color="primary" (click)="drawer.toggle()">Toggle drawer</button>
-    <button mat-raised-button (click)="saveSchema()">save</button>
+    <button mat-raised-button color="primary" (click)="drawer.toggle()">
+      <mat-icon matTooltip="open" *ngIf="!drawer.opened">keyboard_arrow_right</mat-icon>
+      <mat-icon matTooltip="close" *ngIf="drawer.opened">keyboard_arrow_left</mat-icon>
+    </button>
+    <button mat-raised-button matTooltip="Save" (click)="saveSchema()"><mat-icon>save</mat-icon></button>
   </mat-drawer-content>
 
 </mat-drawer-container>

@@ -1,6 +1,5 @@
-{{data.schema | json}}
 <button mat-raised-button color="accent" (click)="addCol()">
-  <mat-icon>add_box</mat-icon>
+  <mat-icon matTooltip="新增欄位">add_box</mat-icon>
 </button>
 <div style="max-height: 400px;">
   <!-- <table mat-table [dataSource]="dataSource" cdkDropList cdkDropListOrientation="horizontal"
@@ -29,8 +28,10 @@
   <table mat-table [dataSource]="dataSource" cdkDropList cdkDropListOrientation="horizontal"
     (cdkDropListDropped)="drop($event)">
 
-    <ng-container *ngFor="let head of data.schema" matColumnDef="{{head}}">
-      <th mat-header-cell *matHeaderCellDef> {{head}} </th>
+    <ng-container *ngFor="let head of data.schema;let i = index;" matColumnDef="{{head}}">
+      <th mat-header-cell *matHeaderCellDef> {{head}}
+        <mat-icon (click)="rmCol(i)" style="cursor: pointer;" matTooltip="刪除欄位"> delete </mat-icon>
+      </th>
       <td mat-cell *matCellDef="let element"> <input type="text" [(ngModel)]="element[head]"> </td>
     </ng-container>
     <tr mat-header-row *matHeaderRowDef="data.schema"></tr>

@@ -29,7 +29,7 @@ button{
 
 :host>>>mat-drawer div::-webkit-scrollbar {
     width: 10px;
-    height: 5px;
+    height: 10px;
 }
 
 /* Track */
