@@ -97,7 +97,7 @@ export class MapDesignerComponent implements OnInit {
 
     this.buildPathElement();
 
-    this.buildScaleBar();
+    
 
     this.buildZoomBtn();
 
@@ -111,6 +111,8 @@ export class MapDesignerComponent implements OnInit {
       }
       this.addBubbles(bubble.name, null, "myCircles", data, "circle", bubble.attrs);
     }
+    
+    this.buildScaleBar();
   }
 
   addBubbles(name: string, parent: string, selectAll: string, data: any[], elementType: string, attrs: any) {
@@ -304,10 +306,11 @@ export class MapDesignerComponent implements OnInit {
       x = centroid[0]; //緯度轉x
       y = centroid[1]; //經度轉y
     } else {
-      return;
+      x = this.width/2;
+      y = this.height/2;
     }
 
-    this.map['scaleBarZoom'].zoomFactor(k); //比例尺設定改變(刻度)
+    this.map['scaleBarZoom'].zoomFactor(this.k); //比例尺設定改變(刻度)
     this.map["bar"].call(this.map['scaleBarZoom']); //rebuild 比例尺
 
     this.map['pathGroup']
@@ -339,7 +342,7 @@ export class MapDesignerComponent implements OnInit {
       }
     });
     d3.select("#zoom_out").on("click",()=>{
-      if (this.k > 3) {
+      if (this.k >= 3) {
         this.k-=2;
         this.centerScale(this.k);
       }

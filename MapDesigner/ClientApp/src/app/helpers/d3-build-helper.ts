@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { json } from 'd3';
+import { contourDensity, json } from 'd3';
 import * as t from "topojson";
 
 import { Bubbles, D3Element, IBubbles, IPath } from '../config-bar/config';
@@ -133,4 +133,28 @@ export class D3BuildHelper implements IMapBuilder {
     deepClone(object: any) {
         return JSON.parse(JSON.stringify(object));
     }
+    attrtypes=[
+        {
+            centerLong:'number',
+            centerLat:'number',
+            scale:'number',
+            translateX:'number',
+            translateY:'number',
+            fill:'color',
+            stroke:'color',
+            strokeWidth:'number',
+            mouseover:'code',
+            mousemove:'code',
+            mouseleave:'code',
+            click:'code',
+            id:'string',
+            class:'string',
+            left:'number',
+            top:'number',
+            cx:'number',
+            cy:'number',
+            r:'number',
+            fillOpacity:'number'
+        }
+    ];
 }

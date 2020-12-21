@@ -13,9 +13,10 @@
         </div>
         <div *ngFor="let attr of attrKeys(config)">
           <label for="{{attr}}">{{attr}}</label>
+          {{mapBuilder.attrtypes[attr]}}
           <button (click)="config.advance[attr]=!config.advance[attr]">advance</button>
           <p *ngIf="!config.advance[attr]">
-            <input id="{{attr}}" type="text" [(ngModel)]="config.attrs[attr]">
+            <input id="{{attr}}" type="mapBuilder[attr]" [(ngModel)]="config.attrs[attr]">
           </p>
           <p *ngIf="config.advance[attr]">
             <ace-editor [(ngModel)]="config.attrs[attr]" style="height:150px;">
