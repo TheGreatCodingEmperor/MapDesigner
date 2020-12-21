@@ -4,24 +4,28 @@
     <mat-tab-group animationDuration="0ms">
       <mat-tab label="{{config.name}}" *ngFor="let config of mapSchema" [ngSwitch]="config.type">
         <div *ngSwitchCase="'path'">
-          <label>code</label>
+          <label matTooltip="dataSet 前處理">code</label>
           <ace-editor [(ngModel)]="config.code" style="height:150px;">
           </ace-editor>
         </div>
         <div *ngSwitchCase="'bubble'">
-          <button (click)="openDialog(config.DataSetId)">table</button>
+          <button mat-mini-fab (click)="openDialog(config.DataSetId)" matTooltip="dataSet 編輯">
+            <mat-icon>table_chart</mat-icon>
+          </button>
+          <!-- <button (click)="openDialog(config.DataSetId)"><mat-icon>table_chart</mat-icon></button> -->
         </div>
         <div *ngFor="let attr of attrKeys(config)">
-          <label for="{{attr}}">{{attr}}</label>
-          {{mapBuilder.attrtypes[attr]}}
-          <button (click)="config.advance[attr]=!config.advance[attr]">advance</button>
-          <p *ngIf="!config.advance[attr]">
-            <input id="{{attr}}" [type]="mapBuilder.attrtypes[attr]" [(ngModel)]="config.attrs[attr]">
-          </p>
+          <mat-form-field *ngIf="!config.advance[attr]" appearance="legacy">
+            <mat-label>{{attr}}</mat-label>
+            <input matInput [type]="mapBuilder.attrtypes[attr]" [(ngModel)]="config.attrs[attr]">
+            <mat-icon matTooltip="進階邏輯" (click)="config.advance[attr]=!config.advance[attr]" matSuffix>code</mat-icon>
+          </mat-form-field>
           <p *ngIf="config.advance[attr]">
+            <label>{{attr}}<mat-icon matTooltip="常數設定" style="float: right;" (click)="config.advance[attr]=!config.advance[attr]">code</mat-icon></label>
             <ace-editor [(ngModel)]="config.attrs[attr]" style="height:150px;">
             </ace-editor>
           </p>
+
         </div>
       </mat-tab>
     </mat-tab-group>
@@ -33,13 +37,13 @@
   <mat-drawer-content fxFlex="70%" style="position: relative;">
     <div class="d3-geomap" id="map" style="position: relative;">
       <div style="position: absolute;z-index:2;">
-        <button mat-mini-fab id="zoom_in" aria-label="Example icon button with a heart icon">
+        <button mat-mini-fab id="zoom_in" style="border-radius: 10px;" aria-label="Example icon button with a heart icon">
           <mat-icon mat-mini-fab>add</mat-icon>
         </button>
-        <button mat-mini-fab id="zoom_out" aria-label="Example icon button with a heart icon">
+        <button mat-mini-fab id="zoom_out" style="border-radius: 10px;" aria-label="Example icon button with a heart icon">
           <mat-icon mat-mini-fab>remove</mat-icon>
         </button>
-        <button mat-mini-fab id="zoom_none" aria-label="Example icon button with a heart icon">
+        <button mat-mini-fab id="zoom_none" style="border-radius: 10px;" aria-label="Example icon button with a heart icon">
           <mat-icon mat-mini-fab>home</mat-icon>
         </button>
       </div>

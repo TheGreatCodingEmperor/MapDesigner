@@ -1,3 +1,4 @@
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { AfterViewInit, Component, Inject, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -26,6 +27,8 @@ export class DataEditorComponent implements AfterViewInit {
 
   displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
   dataSource = new MatTableDataSource<any>(this.data.data);
+  
+  // columns = this.data.schema;
 
   constructor(
     public dialogRef: MatDialogRef<DataEditorComponent>,
@@ -49,9 +52,14 @@ export class DataEditorComponent implements AfterViewInit {
     this.data.schema.splice(index,1);
   }
 
-  onSearchChange(searchValue: string,index:number): void {  
-    console.log(searchValue);
-    this.data.schema[index] = searchValue
-  }
+  trackByFn(index: any, item: any) {
+    return index;
+}
 
+  drop(event: CdkDragDrop<string[]>) {
+    console.log(this.data.schema);
+    console.log(event.previousIndex)
+    console.log(event.currentIndex)
+    moveItemInArray(this.data.schema, event.previousIndex, event.currentIndex);
+  }
 }

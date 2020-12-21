@@ -91,25 +91,6 @@ namespace MapDesigner.Controllers {
                 return NotFound ();
             }
         }
-        // public void patchMap (MapSchema body) {
-        //     var exist = _mapContext.Set<MapSchema> ().SingleOrDefault (x => x.Id == body.Id);
-        //     if (exist == null) {
-        //         _mapContext.MapSchema.Add (body);
-        //     } else {
-        //         var newItem = DeepClone (exist, body);
-        //         _mapContext.Set<MapSchema> ().Update (newItem);
-        //     }
-        // }
-
-        // public void patchData (DataSet body) {
-        //     var exist = _mapContext.Set<DataSet> ().SingleOrDefault (x => x.DataSetId == body.DataSetId);
-        //     if (exist == null) {
-        //         _mapContext.DataSet.Add (body);
-        //     } else {
-        //         var newItem = DeepClone (exist, body);
-        //         _mapContext.Set<DataSet> ().Update (newItem);
-        //     }
-        // }
         public T DeepClone<T> (T res, T newT) {
             var properties = typeof (T).GetProperties ();
             foreach (var property in properties) {

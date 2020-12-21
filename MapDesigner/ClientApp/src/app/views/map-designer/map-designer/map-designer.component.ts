@@ -30,7 +30,7 @@ export class MapDesignerComponent implements OnInit {
   map = {};
   k = 3;
   width = document.querySelector(".container").clientWidth;
-  height =  window.innerHeight*0.7;
+  height = window.innerHeight * 0.7;
   mapSchema = [];
   dataSets = [];
 
@@ -43,33 +43,33 @@ export class MapDesignerComponent implements OnInit {
 
   ngOnInit() {
     let width = document.querySelector(".container").clientWidth;
-    this.width = width<700?width:700;
+    this.width = width < 700 ? width : 700;
     let height = window.innerHeight;
-    this.height = height*0.7<600?600:height*0.7;
+    this.height = height * 0.7 < 600 ? 600 : height * 0.7;
     var path = this.mapSchema.find(x => x.type == "path");
-    this.http.get(`${this.baseUrl()}/MapSchema/MapDesigner/1`).subscribe((res:any)=>{
-      try{
+    this.http.get(`${this.baseUrl()}/MapSchema/MapDesigner/1`).subscribe((res: any) => {
+      try {
         this.mapSchema = JSON.parse(res.MapSchema.Schema);
       }
-      catch{
+      catch {
         alert("map schema error!");
       }
-      
-      this.dataSets = res.DataSets.map(x =>{ 
-        let data:any[] = [];
-        try{
+
+      this.dataSets = res.DataSets.map(x => {
+        let data: any[] = [];
+        try {
           data = JSON.parse(x.Data);
         }
-        catch{
+        catch {
           alert(`data ${x.Name} error!`);
         }
         return {
-          DataSetId:x.DataSetId,
-          DataType:x.DataType,
-          Name:x.Name,
-          name:x.Name,
-          schema:x.Schema?x.Schema.split(','):null,
-          data:data
+          DataSetId: x.DataSetId,
+          DataType: x.DataType,
+          Name: x.Name,
+          name: x.Name,
+          schema: x.Schema ? x.Schema.split(',') : null,
+          data: data
         }
       });
       this.mapBuilder.map = this.map;
@@ -97,21 +97,21 @@ export class MapDesignerComponent implements OnInit {
 
     this.buildPathElement();
 
-    
+
 
     this.buildZoomBtn();
 
     let bubbles = this.mapSchema.filter(x => x.type == 'bubble');
     for (let bubble of bubbles) {
       let data = [];
-      try{
-        data = this.dataSets.find(x=> x.DataSetId == bubble.DataSetId).data;
-      }catch{
+      try {
+        data = this.dataSets.find(x => x.DataSetId == bubble.DataSetId).data;
+      } catch {
         alert(`not found DataSetId#{DataSetId}`)
       }
       this.addBubbles(bubble.name, null, "myCircles", data, "circle", bubble);
     }
-    
+
     this.buildScaleBar();
   }
 
@@ -155,16 +155,16 @@ export class MapDesignerComponent implements OnInit {
       .on("click", () => {
         eval(config.attrs.click)
       });;
-      let attrs = Object.keys(config.attrs);
-      for(let attr of attrs){
-        this.map["rect"].attr(attr,()=>{
-          if(config.advance.fill)
+    let attrs = Object.keys(config.attrs);
+    for (let attr of attrs) {
+      this.map["rect"].attr(attr, () => {
+        if (config.advance.fill)
           return eval(config.attrs[attr]);
-          else{
-            return config.attrs[attr];
-          }
-        })
-      }
+        else {
+          return config.attrs[attr];
+        }
+      })
+    }
   }
 
   buildPathElement() {
@@ -207,18 +207,26 @@ export class MapDesignerComponent implements OnInit {
   }
 
   buildClicked() {
+    let pathColor = this.mapSchema.find(x => x.type == "path").fill;
     this.map['clicked'] = (d) => {
+      console.log(d);
       let x, y;
 
       if (d && this.map["centered"] !== d) {
         if (this.k < 3) this.k = 3;
-        // console.log(this.map["path"].centroid(d))
-        //中心點相同或空白處(無geo item)
-        var centroid = this.map["path"].centroid(d);
-        x = centroid[0]; //緯度轉x
-        y = centroid[1]; //經度轉y
-        // this.k = 3; //放大3倍
-        this.map["centered"] = d; //中心點(geo item)
+        if (d.long && d.lat) {
+          x = this.map["projection"]([d.long, d.lat])[0];
+          y = this.map["projection"]([d.long, d.lat])[1];
+        }
+        else {
+          // console.log(this.map["path"].centroid(d))
+          //中心點相同或空白處(無geo item)
+          var centroid = this.map["path"].centroid(d);
+          x = centroid[0]; //緯度轉x
+          y = centroid[1]; //經度轉y   
+        }
+        //中心點(geo item)
+        this.map["centered"] = d;
       } else {
         x = this.width / 2;
         y = this.height / 2;
@@ -228,6 +236,7 @@ export class MapDesignerComponent implements OnInit {
 
       this.map['scaleBarZoom'].zoomFactor(this.k); //比例尺設定改變(刻度)
       this.map["bar"].call(this.map['scaleBarZoom']); //rebuild 比例尺
+      this.map['svg'].selectAll('.path').style('fill', pathColor);
 
       this.map['pathGroup']
         .transition()
@@ -286,32 +295,38 @@ export class MapDesignerComponent implements OnInit {
     this.http.patch(`${this.baseUrl()}/MapSchema`, { Id: 1, Name: 'Demo', Schema: JSON.stringify(this.mapSchema) }, {}).subscribe(res => {
       console.log(res)
     });
-    let dataSets = this.dataSets.filter(x => x.DataType!=1);
+    let dataSets = this.dataSets.filter(x => x.DataType != 1);
     console.log(dataSets)
-    for(let data of dataSets){
-      let save:any = {};
+    for (let data of dataSets) {
+      let save: any = {};
       save.DataSetId = data.DataSetId;
       save.DataType = data.DataType;
       save.Name = data.name;
       save.Schema = data.schema.join(',');
       save.Data = JSON.stringify(data.data);
-      this.http.patch(`${this.baseUrl()}/DataSet`,save).subscribe(res=>{},error=>{});
+      this.http.patch(`${this.baseUrl()}/DataSet`, save).subscribe(res => { }, error => { });
     }
   }
 
-  centerScale(k: number) {
+  centerScale() {
     let d = this.map["centered"];
     let x, y;
 
     if (d) {
       // console.log(this.map["path"].centroid(d))
+      if (d.long && d.lat) {
+        x = this.map["projection"]([d.long, d.lat])[0];
+        y = this.map["projection"]([d.long, d.lat])[1];
+      }
       //中心點相同或空白處(無geo item)
-      var centroid = this.map["path"].centroid(d);
-      x = centroid[0]; //緯度轉x
-      y = centroid[1]; //經度轉y
+      else {
+        var centroid = this.map["path"].centroid(d);
+        x = centroid[0]; //緯度轉x
+        y = centroid[1]; //經度轉y
+      }
     } else {
-      x = this.width/2;
-      y = this.height/2;
+      x = this.width / 2;
+      y = this.height / 2;
     }
 
     this.map['scaleBarZoom'].zoomFactor(this.k); //比例尺設定改變(刻度)
@@ -339,27 +354,27 @@ export class MapDesignerComponent implements OnInit {
   }
 
   buildZoomBtn() {
-    d3.select("#zoom_in").on("click",()=>{
+    d3.select("#zoom_in").on("click", () => {
       if (this.k <= 10) {
-        this.k+=2;
-        this.centerScale(this.k);
+        this.k += 2;
+        this.centerScale();
       }
     });
-    d3.select("#zoom_out").on("click",()=>{
+    d3.select("#zoom_out").on("click", () => {
       if (this.k >= 3) {
-        this.k-=2;
-        this.centerScale(this.k);
+        this.k -= 2;
+        this.centerScale();
       }
     });
-    d3.select("#zoom_none").on("click",()=>{
+    d3.select("#zoom_none").on("click", () => {
       this.map['clicked'](null);
     });
   }
-  openDialog(DataSetId:string|number): void {
+  openDialog(DataSetId: string | number): void {
     let data = this.dataSets.find(x => x.DataSetId == DataSetId);
     const dialogRef = this.dialog.open(DataEditorComponent, {
       width: '50vw',
-      data: {schema: data.schema, data: data.data}
+      data: { schema: data.schema, data: data.data }
     });
 
     dialogRef.afterClosed().subscribe(result => {
