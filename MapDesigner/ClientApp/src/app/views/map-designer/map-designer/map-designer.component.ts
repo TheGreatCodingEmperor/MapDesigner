@@ -109,14 +109,14 @@ export class MapDesignerComponent implements OnInit {
       }catch{
         alert(`not found DataSetId#{DataSetId}`)
       }
-      this.addBubbles(bubble.name, null, "myCircles", data, "circle", bubble.attrs);
+      this.addBubbles(bubble.name, null, "myCircles", data, "circle", bubble);
     }
     
     this.buildScaleBar();
   }
 
-  addBubbles(name: string, parent: string, selectAll: string, data: any[], elementType: string, attrs: any) {
-    this.mapBuilder.dataSetBuildElements(name, parent, selectAll, data, elementType, attrs);
+  addBubbles(name: string, parent: string, selectAll: string, data: any[], elementType: string, config: any) {
+    this.mapBuilder.dataSetBuildElements(name, parent, selectAll, data, elementType, config);
   }
 
   buildProjection() {
@@ -152,15 +152,19 @@ export class MapDesignerComponent implements OnInit {
       // .attr("height", this.height)
       .style("width", this.width)
       .style("height", this.height)
-      .attr("fill", () => {
-        return eval(config.attrs.fill);
-      })
-      .attr("stroke", () => {
-        return eval(config.attrs.stroke);
-      })
       .on("click", () => {
         eval(config.attrs.click)
-      });
+      });;
+      let attrs = Object.keys(config.attrs);
+      for(let attr of attrs){
+        this.map["rect"].attr(attr,()=>{
+          if(config.advance.fill)
+          return eval(config.attrs[attr]);
+          else{
+            return config.attrs[attr];
+          }
+        })
+      }
   }
 
   buildPathElement() {
@@ -178,7 +182,7 @@ export class MapDesignerComponent implements OnInit {
     //   this.mapBuilder.buildPath(this.pathCondition, data, null);
     // });
     let data = this.dataSets.find(x => x.name == "villages").data;
-    this.mapBuilder.buildPath(config.code, data, config.tag, config.attrs);
+    this.mapBuilder.buildPath(config.code, data, config.tag, config);
   }
 
   buildPathGruop() {

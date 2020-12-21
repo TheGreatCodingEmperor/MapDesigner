@@ -24,7 +24,7 @@ export interface IMapBuilder {
      * @param elementType append element type
      * @param attrs element 內容參數
      */
-    dataSetBuildElements(name: string, parent: string, selectAll: string, data: any[], elementType: string, attrs: object): any;
+    dataSetBuildElements(name: string, parent: string, selectAll: string, data: any[], elementType: string, config: object): any;
     /**
      * @summary foreach data 執行 action
      * @param parent select節點 ex:map["key"]
@@ -51,14 +51,14 @@ export interface IMapBuilder {
      * @param data 資料(topojson)
      * @param attrs element 內容參數
      */
-    buildPath(code: string, data: any[], tag: string, attrs: object): any;
+    buildPath(code: string, data: any[], tag: string, config: object): any;
 }
 export class D3BuildHelper implements IMapBuilder {
     width = 900;
     height = 600;
     public map = {};
     public dataSets = [];
-    dataSetBuildElements(name: string, parent: string, selectAll: string, data: any[], elementType: string, attrs: any) {
+    dataSetBuildElements(name: string, parent: string, selectAll: string, data: any[], elementType: string, config: any) {
         var element = this.map["svg"];
         if (parent) {
             element = this.map[parent];
@@ -70,27 +70,27 @@ export class D3BuildHelper implements IMapBuilder {
             // .attr("class", (d) => { return eval(attrs.class) })
             // .attr("id", (d) => { return eval(attrs.id) })
             .attr("cx", (d) => {
-                return eval(attrs.cx)
+                return config.advance["cx"]?eval(config.attrs["cx"]):config.attrs["cx"];
             })
             .attr("cy", (d) => {
-                return eval(attrs.cy)
+                return config.advance["cy"]?eval(config.attrs["cy"]):config.attrs["cy"];
             })
-            .attr("r", (d) => { return eval(attrs.r) }) //圓形半徑
-            .style("fill", (d) => { return eval(attrs.fill) }) //圓心顏色
-            .attr("stroke", (d) => { return eval(attrs.stroke) }) //圓形外圍邊框
-            .attr("stroke-width", (d) => { return eval(attrs.strokeWidth) }) //邊框寬度
-            .attr("fill-opacity", (d) => { return eval(attrs.fillOpacity) }) //圓心透明
+            .attr("r", (d) => { return config.advance["r"]?eval(config.attrs["r"]):config.attrs["r"]; }) //圓形半徑
+            .style("fill", (d) => { return config.advance["fill"]?eval(config.attrs["fill"]):config.attrs["fill"]; }) //圓心顏色
+            .attr("stroke", (d) => { return config.advance["stroke"]?eval(config.attrs["stroke"]):config.attrs["stroke"]; }) //圓形外圍邊框
+            .attr("stroke-width", (d) => { return config.advance["strokeWidth"]?eval(config.attrs["strokeWidth"]):config.attrs["strokeWidth"]; }) //邊框寬度
+            .attr("fill-opacity", (d) => { return config.advance["fillOpacity"]?eval(config.attrs["fillOpacity"]):config.attrs["fillOpacity"]; }) //圓心透明
             .on("mouseover", (e, d) => {
-                eval(attrs.mouseover)
+                eval(config.attrs.mouseover)
             })
             .on("mousemove", (e, d) => {
-                eval(attrs.mousemove)
+                eval(config.attrs.mousemove)
             })
             .on("mouseleave", (e, d) => {
-                eval(attrs.mouseleave)
+                eval(config.attrs.mouseleave)
             })
             .on("click", (e, d) => {
-                eval(attrs.click);
+                eval(config.attrs.click);
             });
         this.map[name] = element;
     }
@@ -103,7 +103,7 @@ export class D3BuildHelper implements IMapBuilder {
     advanceAction(code: string) {
         throw new Error('Method not implemented.');
     }
-    buildPath = (code: string, data: any[], tag: string, attrs: any) => {
+    buildPath = (code: string, data: any[], tag: string, config: any) => {
         data = this.deepClone(data);
         let afterProceed = eval(code);
         this.map["pathGroup"]
@@ -112,29 +112,48 @@ export class D3BuildHelper implements IMapBuilder {
             .enter()
             .append("path")
             .attr("d", this.map["path"])
-            .attr("id", (d: any) => { return eval(attrs.id) })
-            .attr("class",(d: any)=>{ return eval(attrs.class) })
-            .attr("fill", (d) => { return eval(attrs.fill) })
-            .attr("stroke", (d) => { return eval(attrs.stroke) })
-            .attr("stroke-width", (d) => { return eval(attrs.strokeWidth) })
+            .attr("id", (d: any) => {
+                if(config.advance["id"]) 
+                    return eval(config.attrs.id);
+                return config.attrs["id"];
+            })
+            .attr("class",(d: any)=>{ 
+                if(config.advance["class"])
+                    return eval(config.attrs.class);
+                return config.attrs["class"]
+             })
+            .attr("fill", (d) => { 
+                if(config.advance["fill"])
+                    return eval(config.attrs.fill) 
+                return config.attrs["fill"]
+            })
+            .attr("stroke", (d) => { 
+                if(config.advance["stroke"])
+                    return eval(config.attrs.stroke) 
+                return config.attrs["stroke"]
+            })
+            .attr("stroke-width", (d) => { 
+                if(config.advance["strokeWidth"])
+                    return eval(config.attrs.strokeWidth) 
+                return config.attrs["strokeWidth"]
+            })
             .on("mouseover", (e, d) => {
-                eval(attrs.mouseover);
+                eval(config.attrs.mouseover);
             })
             .on("mousemove", (e, d) => {
-                eval(attrs.mousemove);
+                eval(config.attrs.mousemove);
             })
             .on("mouseleave", (e, d) => {
-                eval(attrs.mouseleave);
+                eval(config.attrs.mouseleave);
             })
             .on("click", (e, d) => {
-                eval(attrs.click);
+                eval(config.attrs.click);
             });
     }
     deepClone(object: any) {
         return JSON.parse(JSON.stringify(object));
     }
-    attrtypes=[
-        {
+    attrtypes={
             centerLong:'number',
             centerLat:'number',
             scale:'number',
@@ -155,6 +174,5 @@ export class D3BuildHelper implements IMapBuilder {
             cy:'number',
             r:'number',
             fillOpacity:'number'
-        }
-    ];
+        };
 }
