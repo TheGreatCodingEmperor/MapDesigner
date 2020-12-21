@@ -6,40 +6,43 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using MapDesigner.Helpers;
+using MapDesigner.Models;
 
 namespace MapDesigner.Controllers {
     [ApiController]
     [Route ("[controller]")]
     public class MapSchemaController : ControllerBase {
         private MapDesignerContext _mapContext { get; }
+        private IBasicEfcoreHelper _efCoreHelper {get;}
 
-        public MapSchemaController (MapDesignerContext mapDesigner) {
+        public MapSchemaController (MapDesignerContext mapDesigner,IBasicEfcoreHelper basicEfcoreHelper) {
             _mapContext = mapDesigner;
+            _efCoreHelper = basicEfcoreHelper;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetDatasAPI () {
-            var dbSets = _mapContext.Set<MapSchema> ().AsNoTracking ().ToList ();
+            var dbSets = _efCoreHelper.GetList<MapSchema>(_mapContext);
             await Task.CompletedTask;
             return Ok (JsonConvert.SerializeObject (dbSets, Formatting.Indented));
         }
 
         [HttpPatch]
         public async Task<IActionResult> PatchDataAPI ([FromBody] MapSchema body) {
-            var exist = _mapContext.Set<MapSchema> ().SingleOrDefault (x => x.Id == body.Id);
-            if (exist == null) {
-                _mapContext.MapSchema.Add (body);
-            } else {
-                var newItem = DeepClone (exist, body);
-                _mapContext.Set<MapSchema> ().Update (newItem);
+            try{
+                _efCoreHelper.PatchSingle<MapSchema,int>(_mapContext,body,true);
+                await _mapContext.SaveChangesAsync ();
+               return Ok (JsonConvert.SerializeObject (body, Formatting.Indented)); 
             }
-            await _mapContext.SaveChangesAsync ();
-            return Ok (JsonConvert.SerializeObject (body, Formatting.Indented));
+            catch(Exception e){
+                return BadRequest (e.ToString());
+            }
         }
 
         [HttpGet ("{Id}")]
-        public async Task<IActionResult> GetDataAPI ([FromQuery] int Id) {
-            var dbSet = _mapContext.Set<MapSchema> ().SingleOrDefault (x => x.Id == Id);
+        public async Task<IActionResult> GetDataAPI ([FromRoute] int Id) {
+            var dbSet = _efCoreHelper.GetSingle<MapSchema,int>(_mapContext,Id);
             await Task.CompletedTask;
             return Ok (JsonConvert.SerializeObject (dbSet, Formatting.Indented));
         }
@@ -53,42 +56,30 @@ namespace MapDesigner.Controllers {
             return Ok (JsonConvert.SerializeObject (new { MapSchema = dbSet, DataSets = dataSets }, Formatting.Indented));
         }
 
-        [HttpPatch ("MapDesigner/{Id}")]
-        public async Task<IActionResult> PatchFullSchemaAPI ([FromRoute] int MapId, [FromBody] dynamic body) {
-            // try {
-            //     var exist = _mapContext.Set<MapSchema> ().SingleOrDefault (x => x.Id == body["MapSchema"].Id);
-            //     if (exist == null) {
-            //         _mapContext.MapSchema.Add (body);
-            //     } else {
-            //         var newItem = DeepClone (exist, body);
-            //         _mapContext.Set<MapSchema> ().Update (newItem);
-            //     }
-            //     foreach (var dataset in body["DataSets"]) {
-            //         var existd = _mapContext.Set<DataSet> ().SingleOrDefault (x => x.DataSetId == body.DataSetId);
-            //         if (exist == null) {
-            //             _mapContext.DataSet.Add (body);
-            //         } else {
-            //             var newItem = DeepClone (exist, body);
-            //             _mapContext.Set<DataSet> ().Update (newItem);
-            //         }
-            //     }
-            //     await _mapContext.SaveChangesAsync ();
-            // } catch (Exception e) {
-            //     return BadRequest (e.ToString ());
-            // }
-            await Task.CompletedTask;
-            return Ok ();
+        [HttpPatch ("MapDesigner")]
+        public async Task<IActionResult> PatchFullSchemaAPI ([FromBody] MapAllShcema body) {
+            try{
+                _efCoreHelper.PatchSingle<MapSchema,int>(_mapContext,body.MapSchema,false);
+                foreach(var data in body.DataSets){
+                    _efCoreHelper.PatchSingle<DataSet,int>(_mapContext,data,false);
+                }
+                await _mapContext.SaveChangesAsync();
+                return Ok ();
+            }
+            catch(Exception e){
+                return BadRequest(e.ToString());
+            }
         }
 
         [HttpDelete ("{Id}")]
         public async Task<IActionResult> DeleteDatasAPI ([FromQuery] int Id) {
-            var dbSet = _mapContext.Set<MapSchema> ().Where (x => x.Id == Id).SingleOrDefault ();
-            if (dbSet != null) {
-                _mapContext.Set<MapSchema> ().Remove (dbSet);
-                await _mapContext.SaveChangesAsync ();
-                return Ok ();
-            } else {
-                return NotFound ();
+            await Task.CompletedTask;
+            try{
+                _efCoreHelper.RemoveSingle<MapSchema,int>(_mapContext,Id,true);
+                return Ok();
+            }
+            catch(Exception e){
+                return BadRequest(e.ToString());
             }
         }
         public T DeepClone<T> (T res, T newT) {

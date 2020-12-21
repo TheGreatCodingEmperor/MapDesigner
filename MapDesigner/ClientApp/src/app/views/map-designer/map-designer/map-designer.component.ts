@@ -6,6 +6,7 @@ import * as d3GeoBar from "d3-geo-scale-bar";
 import { D3BuildHelper } from 'src/app/helpers/d3-build-helper';
 import { MatDialog } from '@angular/material/dialog';
 import { DataEditorComponent } from '../components/data-editor/data-editor.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 @Component({
@@ -36,7 +37,8 @@ export class MapDesignerComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private _snackBar: MatSnackBar
   ) {
 
   }
@@ -292,9 +294,11 @@ export class MapDesignerComponent implements OnInit {
 
   saveSchema() {
     let body = {};
-    this.http.patch(`${this.baseUrl()}/MapSchema`, { Id: 1, Name: 'Demo', Schema: JSON.stringify(this.mapSchema) }, {}).subscribe(res => {
-      console.log(res)
-    });
+    body["MapSchema"] = { Id: 1, Name: 'Demo', Schema: JSON.stringify(this.mapSchema) };
+    body["DataSets"] = [];
+    // this.http.patch(`${this.baseUrl()}/MapSchema`, { Id: 1, Name: 'Demo', Schema: JSON.stringify(this.mapSchema) }, {}).subscribe(res => {
+    //   console.log(res)
+    // });
     let dataSets = this.dataSets.filter(x => x.DataType != 1);
     console.log(dataSets)
     for (let data of dataSets) {
@@ -304,8 +308,12 @@ export class MapDesignerComponent implements OnInit {
       save.Name = data.name;
       save.Schema = data.schema.join(',');
       save.Data = JSON.stringify(data.data);
-      this.http.patch(`${this.baseUrl()}/DataSet`, save).subscribe(res => { }, error => { });
+      body["DataSets"].push(save);
+      // this.http.patch(`${this.baseUrl()}/DataSet`, save).subscribe(res => { }, error => { });
     }
+    this.http.patch(`${this.baseUrl()}/MapSchema/MapDesigner`, body).subscribe(res => { this.openSnackBar("Save Successed!") }, error => {
+      this.openSnackBar("Save Failed");
+    });
   }
 
   centerScale() {
@@ -380,6 +388,11 @@ export class MapDesignerComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
       // this.table = result;
+    });
+  }
+  openSnackBar(message: string) {
+    this._snackBar.open(message, null, {
+      duration: 2000,
     });
   }
 }

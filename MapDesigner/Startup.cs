@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MapDesigner.Helpers;
 
 namespace MapDesigner {
     public class Startup {
@@ -25,6 +26,8 @@ namespace MapDesigner {
             services.AddDbContext<MapDesignerContext> (options =>
                 options.UseMySql (Configuration["ConnectionString:Maria"],sql => sql.MigrationsAssembly (migrationsAssembly))
             );
+
+            services.AddScoped<IBasicEfcoreHelper,BasicEfcoreHelper>();
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles (configuration => {
