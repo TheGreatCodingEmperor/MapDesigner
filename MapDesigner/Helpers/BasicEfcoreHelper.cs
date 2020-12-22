@@ -7,19 +7,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MapDesigner.Helpers{
     public interface IBasicEfcoreHelper{
-        public List<T> GetList<T>(DbContext context)where T: class;
-        public T GetSingle<T,Tkey>(DbContext context,Tkey key)
-        where T: class;
-        public void PatchSingle<T,Tkey>(DbContext context,T body, bool transaction)where T: class;
-        public void RemoveSingle<T,Tkey>(DbContext context,Tkey key, bool transaction)where T: class;
+        public IQueryable<T> GetList<T>(DbContext context)where T: class;
+        public T GetSingle<T,Tkey>(DbContext context,Tkey key)where T: class;
+        public void PatchSingle<T>(DbContext context,T body, bool transaction=true)where T: class;
+        public void PatchList<T>(DbContext context,List<T> body, bool transaction=true)where T:class;
+        public void RemoveSingle<T,Tkey>(DbContext context,Tkey key, bool transaction=true)where T: class;
     }
     public class BasicEfcoreHelper : IBasicEfcoreHelper
     {
         public BasicEfcoreHelper(){
         }
-        public List<T> GetList<T>(DbContext context)where T: class
+        public IQueryable<T> GetList<T>(DbContext context)where T: class
         {
-            return context.Set<T>().AsNoTracking().ToList();
+            return context.Set<T>().AsNoTracking();
         }
 
         public T GetSingle<T, Tkey>(DbContext context,Tkey key)where T: class
@@ -28,7 +28,7 @@ namespace MapDesigner.Helpers{
             return context.Set<T>().SingleOrDefault($"{keyProperty.Name} = {key}");
         }
 
-        public void PatchSingle<T, Tkey>(DbContext context,T body, bool transaction)where T: class
+        public void PatchSingle<T>(DbContext context,T body, bool transaction=true)where T: class
         {
             var keyProperty = typeof(T).GetProperties().FirstOrDefault(x => x.GetCustomAttributes().Any(a => ((KeyAttribute)a) != null));
             var exist = context.Set<T>().SingleOrDefault ($"{keyProperty.Name} = {keyProperty.GetValue(body)}");
@@ -43,7 +43,7 @@ namespace MapDesigner.Helpers{
             }
         }
 
-        public void RemoveSingle<T, Tkey>(DbContext context,Tkey key, bool transaction)where T:class
+        public void RemoveSingle<T, Tkey>(DbContext context,Tkey key, bool transaction=true)where T:class
         {
             var keyProperty = typeof(T).GetProperties().FirstOrDefault(x => x.GetCustomAttributes().Any(a => ((KeyAttribute)a) != null));
             var rmItem = context.Set<T>().SingleOrDefault ($"{keyProperty.Name} = {key}");
@@ -59,6 +59,13 @@ namespace MapDesigner.Helpers{
                 property.SetValue(res,property.GetValue(newT));
             }
             return res;
+        }
+
+        public void PatchList<T>(DbContext context, List<T> body, bool transaction=true) where T : class
+        {
+            foreach(var item in body){
+                PatchSingle<T>(context,item,false);
+            }
         }
     }
 }

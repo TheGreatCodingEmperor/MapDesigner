@@ -1,0 +1,42 @@
+<mat-dialog-content class="mat-typography">
+    <mat-form-field appearance="legacy">
+        <mat-label>Name</mat-label>
+        <input matInput placeholder="Name" [(ngModel)]="data.Name">
+    </mat-form-field>
+    <mat-radio-group [(ngModel)]="data.DataType">
+        <mat-radio-button class="example-margin" [value]="1">TopoJson</mat-radio-button>
+        <mat-radio-button class="example-margin" [value]="0">DataSet</mat-radio-button>
+    </mat-radio-group>
+    <div *ngIf="data.DataType==1">
+        <input type="file" (change)="onFileChange($event)" accept=".json" />
+        {{someText}}
+    </div>
+    <div *ngIf="data.DataType==0">
+        <input type="file" (change)="onFileChange($event)"
+            accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+        <mat-radio-group [(ngModel)]="data.Data" (change)="handleChange($event)">
+            <mat-radio-button *ngFor="let page of dataPages" class="example-margin" [value]="import[page]">{{page}}
+            </mat-radio-button>
+        </mat-radio-group>
+
+        <!-- 表頭+表身 -->
+        <table mat-table [dataSource]="data.Data" cdkDropList cdkDropListOrientation="horizontal"
+            (cdkDropListDropped)="drop($event)">
+
+            <ng-container *ngFor="let head of schema;let i = index;" matColumnDef="{{head}}">
+                <th mat-header-cell *matHeaderCellDef> {{head}}
+                    <mat-icon (click)="rmCol(i)" style="cursor: pointer;" matTooltip="刪除欄位"> delete </mat-icon>
+                </th>
+                <td mat-cell *matCellDef="let element"> <input type="text" [(ngModel)]="element[head]"> </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="schema"></tr>
+            <tr mat-row *matRowDef="let row; columns: schema;"></tr>
+        </table>
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <!-- (click)="onNoClick()" -->
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-button (click)="save()" cdkFocusInitial>Save</button>
+</mat-dialog-actions>

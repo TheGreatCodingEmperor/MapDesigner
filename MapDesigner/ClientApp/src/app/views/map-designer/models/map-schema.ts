@@ -1,0 +1,9 @@
+export class MapSchema{
+    Id:number = 0;
+    Name:string = '';
+    Schema:string = JSON.stringify([{"name":"projection","attrs":{"centerLong":120.31041,"centerLat":22.64889,"scale":30000,"translateX":200,"translateY":500},"advance":{"centerLat":false}},{"name":"svg","attrs":{"fill":"'grey'"},"advance":{}},{"name":"rect","attrs":{"fill":"#387aff","stroke":"'black'","click":"this.map['clicked'](null);"},"advance":{"click":true,"fill":false}},{"type":"path","name":"path","code":"data.objects.towns.geometries = data.objects.towns.geometries.filter(\n        x => x.properties.COUNTYNAME == \"高雄市\"\n      ); data;","data":"","tag":"towns","attrs":{"id":"'path' + d.properties.TOWNID","class":"path","fill":"#d57f07","stroke":"'white'","strokeWidth":"0.5","mouseover":"this.map[\"tooltip\"].style(\"opacity\", 1);this.map.svg.select('#path' + d.properties.TOWNID).style('fill','yellow')","mousemove":" this.map[\"tooltip\"]\n        .html( d.properties.COUNTYNAME + d.properties.TOWNNAME)\n        .style(\"left\", e.pageX + 10 + \"px\")\n        .style(\"top\", e.pageY + \"px\");","mouseleave":"\n        this.map[\"tooltip\"].style(\"opacity\", 0);\n        let color = config.attrs[\"fill\"];\n        if(this.map.centered == d)color = \"#ac2b2b\";\n        this.map.svg.select('#path' + d.properties.TOWNID).style('fill',color)","click":"\n        this.map['clicked'](d);\n        this.map.svg.selectAll('.path').style('fill',config.attrs[\"fill\"]);\n        this.map.svg.select('#path' + this.map.centered.properties.TOWNID).style('fill',\"#ac2b2b\")"},"advance":{"mouseover":true,"mousemove":true,"mouseleave":true,"click":true,"id":true,"class":false,"fill":false,"stroke":true}},{"name":"scaleBarZoom","attrs":{"left":"0.8","top":0.05},"advance":{}}]);
+}
+export class MapProject{
+    Map:MapSchema = new MapSchema;
+    DataSets:number[] = [];
+}

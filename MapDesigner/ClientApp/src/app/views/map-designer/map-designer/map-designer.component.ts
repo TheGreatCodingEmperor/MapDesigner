@@ -7,6 +7,8 @@ import { D3BuildHelper } from 'src/app/helpers/d3-build-helper';
 import { MatDialog } from '@angular/material/dialog';
 import { DataEditorComponent } from '../components/data-editor/data-editor.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ActivatedRoute } from '@angular/router';
+import { MapSchemaService } from '../services/map-schema.service';
 
 
 @Component({
@@ -15,18 +17,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrls: ['./map-designer.component.css']
 })
 export class MapDesignerComponent implements OnInit {
-  public baseUrl() {
-    let base = '';
-
-    if (window.location.origin) {
-      base = window.location.origin;
-    } else {
-      base = window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
-    }
-
-    return base.replace(/\/$/, '');
-  }
-
   private mapBuilder = new D3BuildHelper;
   map = {};
   k = 3;
@@ -34,11 +24,13 @@ export class MapDesignerComponent implements OnInit {
   height = window.innerHeight * 0.7;
   mapSchema = [];
   dataSets = [];
+  zoom: any = null;
 
   constructor(
-    private http: HttpClient,
     public dialog: MatDialog,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private mapSchemaService: MapSchemaService,
+    private route: ActivatedRoute
   ) {
 
   }
@@ -49,7 +41,9 @@ export class MapDesignerComponent implements OnInit {
     let height = window.innerHeight;
     this.height = height * 0.7 < 600 ? 600 : height * 0.7;
     var path = this.mapSchema.find(x => x.type == "path");
-    this.http.get(`${this.baseUrl()}/MapSchema/MapDesigner/1`).subscribe((res: any) => {
+    // this.http.get(`${this.baseUrl()}/MapSchema/MapDesigner/1`).subscribe((res: any) => {
+    let id = Number(this.route.snapshot.queryParamMap.get("Id"));
+    this.mapSchemaService.GetMapDesignerInfo(id).subscribe((res: any) => {
       try {
         this.mapSchema = JSON.parse(res.MapSchema.Schema);
       }
@@ -86,6 +80,8 @@ export class MapDesignerComponent implements OnInit {
       d3.select("#svgmap").remove();
     }
     this.buildTooltip();
+
+    this.buildZoom();
 
     this.buildClicked();
 
@@ -141,17 +137,13 @@ export class MapDesignerComponent implements OnInit {
       // .attr("width", this.width)
       // .attr("height", this.height)
       .style("fill", config.attrs.fill)
-      .style("position", "relative");
+      .style("position", "relative").call(this.zoom);
   }
 
   buildRect() {
     let config = this.mapSchema.find(x => x.name == 'rect');
     this.map["rect"] = this.map["svg"]
       .append("rect")
-      // .attr("x", "-10")
-      // .attr("y", "-10")
-      // .attr("width", this.width)
-      // .attr("height", this.height)
       .style("width", this.width)
       .style("height", this.height)
       .on("click", () => {
@@ -173,16 +165,6 @@ export class MapDesignerComponent implements OnInit {
     let config = this.mapSchema.find(x => x.type == 'path');
     // 投影後座標轉路徑
     this.map["path"] = d3.geoPath().projection(this.map["projection"]);
-    // d3.json("assets/villages-10t.json").then((data: any) => {
-    //   // data.objects.towns.geometries = data.objects.towns.geometries.filter(
-    //   //   x => x.properties.COUNTYNAME == "高雄市"
-    //   // );
-
-    //   // `data.objects.towns.geometries = data.objects.towns.geometries.filter(
-    //   //   x => x.properties.COUNTYNAME == "屏東縣"
-    //   // ); data;`
-    //   this.mapBuilder.buildPath(this.pathCondition, data, null);
-    // });
     let data = this.dataSets.find(x => x.name == "villages").data;
     this.mapBuilder.buildPath(config.code, data, config.tag, config);
   }
@@ -311,7 +293,10 @@ export class MapDesignerComponent implements OnInit {
       body["DataSets"].push(save);
       // this.http.patch(`${this.baseUrl()}/DataSet`, save).subscribe(res => { }, error => { });
     }
-    this.http.patch(`${this.baseUrl()}/MapSchema/MapDesigner`, body).subscribe(res => { this.openSnackBar("Save Successed!") }, error => {
+    // this.http.patch(`${this.baseUrl()}/MapSchema/MapDesigner`, body).subscribe(res => { this.openSnackBar("Save Successed!") }, error => {
+    //   this.openSnackBar("Save Failed");
+    // });
+    this.mapSchemaService.SaveMapDesignerInfo(body).subscribe(res => { this.openSnackBar("Save Successed!") }, error => {
       this.openSnackBar("Save Failed");
     });
   }
@@ -359,6 +344,23 @@ export class MapDesignerComponent implements OnInit {
         )
         .style("stroke-width", bubble.attrs.strokeWidth + "px").attr("r", 3);
     }
+  }
+
+  buildZoom() {
+    this.zoom = d3
+      .zoom()
+      .on("zoom", event => {
+        // event.transform.k = this.k;
+        
+        this.map['scaleBarZoom'].zoomFactor(event.transform.k); //比例尺設定改變(刻度)
+        this.map["bar"].call(this.map['scaleBarZoom']); //rebuild 比例尺
+        this.map["pathGroup"].attr("transform", event.transform);
+        let bubbles = this.mapSchema.filter(x => x.type == 'bubble');
+        for (let bubble of bubbles) {
+          this.map[bubble.name].attr("transform", event.transform);
+        }
+      })
+      .scaleExtent([1, 40]);
   }
 
   buildZoomBtn() {

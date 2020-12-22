@@ -6,54 +6,27 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using MapDesigner.Helpers;
 
 namespace MapDesigner.Controllers {
     [ApiController]
     [Route ("[controller]")]
-    public class MapDatasController : ControllerBase {
+    public class MapDatasController : BaseController<MapDatas,int>{
+
         private MapDesignerContext _mapContext { get; }
+        private readonly IBasicEfcoreHelper _efcorHelper;
 
-        public MapDatasController (MapDesignerContext mapDesigner) {
+        public MapDatasController (MapDesignerContext mapDesigner, 
+            IBasicEfcoreHelper efcoreHelper):base( mapDesigner, efcoreHelper) {
             _mapContext = mapDesigner;
+            _efcorHelper = efcoreHelper;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetDatas () {
-            var dbSets = _mapContext.Set<MapDatas> ().AsNoTracking ().ToList ();
+        [HttpGet("datasets/{mapId}")]
+        public async Task<IActionResult> GetMapDataSets([FromRoute] int mapId){
+            var mapSchema = _efcorHelper.GetList<MapDatas>(_mapContext).Where(x => x.MapId == mapId).Select(x => x.DataSetId).ToList();
             await Task.CompletedTask;
-            return Ok (JsonConvert.SerializeObject (dbSets, Formatting.Indented));
-        }
-
-        [HttpPatch]
-        public async Task<IActionResult> PatchData ([FromBody] MapDatas body) {
-            var exist = _mapContext.Set<MapDatas> ().SingleOrDefault (x => x.Id == body.Id);
-            if (exist == null) {
-                _mapContext.MapDatas.Add (exist);
-            } else {
-                // var newItem = DeepClone (exist, body);
-                _mapContext.Set<MapDatas> ().Update (body);
-            }
-            await _mapContext.SaveChangesAsync ();
-            return Ok (JsonConvert.SerializeObject (exist, Formatting.Indented));
-        }
-
-        [HttpGet ("{Id}")]
-        public async Task<IActionResult> GetData ([FromQuery] int Id) {
-            var dbSet = _mapContext.Set<MapDatas> ().SingleOrDefault (x => x.Id == Id);
-            await Task.CompletedTask;
-            return Ok (JsonConvert.SerializeObject (dbSet, Formatting.Indented));
-        }
-
-        [HttpDelete ("{Id}")]
-        public async Task<IActionResult> DeleteDatas ([FromQuery] int Id) {
-            var dbSet = _mapContext.Set<MapDatas> ().Where (x => x.Id == Id).SingleOrDefault ();
-            if (dbSet != null) {
-                _mapContext.Set<MapDatas> ().Remove (dbSet);
-                await _mapContext.SaveChangesAsync ();
-                return Ok ();
-            } else {
-                return NotFound ();
-            }
+            return Ok(mapSchema);
         }
     }
 }

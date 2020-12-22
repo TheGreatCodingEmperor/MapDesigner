@@ -1,0 +1,18 @@
+<mat-dialog-content class="mat-typography">
+    <mat-form-field appearance="legacy">
+        <mat-label>Name</mat-label>
+        <input matInput placeholder="Name" [(ngModel)]="data.project.Map.Name">
+    </mat-form-field>
+    <mat-form-field appearance="legacy">
+        <mat-label>datas</mat-label>
+        <mat-select [(ngModel)]="data.project.DataSets" multiple>
+            <mat-option *ngFor="let item of data.datalist" [value]="item.DataSetId">{{item.Name}}</mat-option>
+        </mat-select>
+    </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <!-- (click)="onNoClick()" -->
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-button [mat-dialog-close]="data.project" cdkFocusInitial>Save</button>
+</mat-dialog-actions>

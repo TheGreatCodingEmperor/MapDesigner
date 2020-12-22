@@ -27,7 +27,7 @@ export class DataEditorComponent implements AfterViewInit {
 
   displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
   dataSource = new MatTableDataSource<any>(this.data.data);
-  
+
   // columns = this.data.schema;
 
   constructor(
@@ -44,17 +44,17 @@ export class DataEditorComponent implements AfterViewInit {
     this.dialogRef.close();
   }
 
-  addCol(){
+  addCol() {
     this.data.schema.push("newCol");
   }
 
-  rmCol(index:number){
-    this.data.schema.splice(index,1);
+  rmCol(index: number) {
+    this.data.schema.splice(index, 1);
   }
 
   trackByFn(index: any, item: any) {
     return index;
-}
+  }
 
   drop(event: CdkDragDrop<string[]>) {
     console.log(this.data.schema);
