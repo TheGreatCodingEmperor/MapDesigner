@@ -13,7 +13,8 @@ import { DatasetService } from '../services/dataset.service';
   styleUrls: ['./dataset-manage.component.css']
 })
 export class DatasetManageComponent implements OnInit {
-  displayedColumns: string[] = ['DataSetId','DataType','Name','Schema']
+  displayedColumns: string[] = ['DataSetId','DataType','Name','Schema','Remove']
+  dataColumns = ['DataSetId','DataType','Name','Schema'];
   dataSource = [];
 
   constructor(
@@ -74,6 +75,19 @@ export class DatasetManageComponent implements OnInit {
         this.openSnackBar("Save Failed!");
       });
     });
+  }
+
+  removeDataset(Id:number|string){
+    this.datasetService.DeleteDataset(Id).subscribe(
+      res=>{
+        this.openSnackBar("Delete Successed!");
+        this.getlist();
+      },
+      error=>{
+        this.openSnackBar("Delete Failed!");
+        this.getlist();
+      }
+    );
   }
 
   openSnackBar(message: string) {

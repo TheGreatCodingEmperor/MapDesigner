@@ -14,6 +14,9 @@
         <th mat-header-cell *matHeaderCellDef > Actions </th>
         <td mat-cell *matCellDef="let row" >
              <button mat-button (click)="editProject(row)">Edit</button>
+             <button mat-raised-button color="warn" (click)="removeProject(row.Map['Id'])">
+                <mat-icon>delete</mat-icon>
+            </button>
         </td>
       </ng-container>
 

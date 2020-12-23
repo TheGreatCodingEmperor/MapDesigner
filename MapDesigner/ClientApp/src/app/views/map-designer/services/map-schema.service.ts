@@ -20,6 +20,9 @@ export class MapSchemaService {
   SaveMapSingle(body:MapSchema):Observable<any>{
     return this.http.patch(`${this.baseUrl()}/MapSchema`,body);
   }
+  DeleteProject(id:number|string):Observable<any>{
+    return this.http.delete(`${this.baseUrl()}/MapSchema/${id}`);
+  }
   GetMapDesignerInfo(mapId:number):Observable<any>{
     return this.http.get(`${this.baseUrl()}/MapSchema/MapDesigner/${mapId}`);
   }

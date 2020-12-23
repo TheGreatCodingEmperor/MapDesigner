@@ -12,10 +12,20 @@ import { DatasetManageComponent } from './dataset-manage/dataset-manage.componen
 import { TopojsonEditorComponent } from './components/topojson-editor/topojson-editor.component';
 import { ProjectEditorComponent } from './components/project-editor/project-editor.component';
 import { DatasetEditorComponent } from './components/dataset-editor/dataset-editor.component';
+import { TestComponent } from './test/test.component';
+import { MapPreviewComponent } from './map-preview/map-preview.component';
 
 
 @NgModule({
-  declarations: [MapDesignerComponent, DataEditorComponent, MapProjectManageComponent, DatasetManageComponent, TopojsonEditorComponent, ProjectEditorComponent, DatasetEditorComponent],
+  declarations: [
+    MapDesignerComponent, 
+    DataEditorComponent, 
+    MapProjectManageComponent, 
+    DatasetManageComponent, 
+    TopojsonEditorComponent, 
+    ProjectEditorComponent, 
+    DatasetEditorComponent, TestComponent, MapPreviewComponent
+  ],
   entryComponents:[
     DataEditorComponent,
     TopojsonEditorComponent,

@@ -1,41 +1,30 @@
-import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import * as d3 from "d3";
-import * as t from "topojson";
-import * as d3GeoBar from "d3-geo-scale-bar";
-import { D3BuildHelper } from 'src/app/helpers/d3-build-helper';
-import { MatDialog } from '@angular/material/dialog';
-import { DataEditorComponent } from '../components/data-editor/data-editor.component';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { D3BuildHelper } from 'src/app/helpers/d3-build-helper';
 import { MapSchemaService } from '../services/map-schema.service';
-import { MapSchema } from '../models/map-schema';
-
+import * as d3 from "d3";
+import * as d3GeoBar from "d3-geo-scale-bar";
 
 @Component({
-  selector: 'app-map-designer',
-  templateUrl: './map-designer.component.html',
-  styleUrls: ['./map-designer.component.css']
+  selector: 'app-map-preview',
+  templateUrl: './map-preview.component.html',
+  styleUrls: ['./map-preview.component.css']
 })
-export class MapDesignerComponent implements OnInit {
+export class MapPreviewComponent implements OnInit {
   private mapBuilder = new D3BuildHelper;
   map = {};
   k = 3;
   width = document.querySelector(".container").clientWidth;
   height = window.innerHeight * 0.7;
   mapSchema = [];
-  mapSchemaInfo = new MapSchema;
   dataSets = [];
   zoom: any = null;
 
   constructor(
-    public dialog: MatDialog,
-    private _snackBar: MatSnackBar,
     private mapSchemaService: MapSchemaService,
-    private route: ActivatedRoute
-  ) {
+    private route:ActivatedRoute
+  ) { }
 
-  }
   ngOnInit() {
     let width = document.querySelector(".container").clientWidth;
     this.width = width < 700 ? width : 700;
@@ -45,7 +34,6 @@ export class MapDesignerComponent implements OnInit {
     // this.http.get(`${this.baseUrl()}/MapSchema/MapDesigner/1`).subscribe((res: any) => {
     let id = Number(this.route.snapshot.queryParamMap.get("Id"));
     this.mapSchemaService.GetMapDesignerInfo(id).subscribe((res: any) => {
-      this.mapSchemaInfo = res.MapSchema;
       try {
         this.mapSchema = JSON.parse(res.MapSchema.Schema);
       }
@@ -97,12 +85,9 @@ export class MapDesignerComponent implements OnInit {
 
     this.buildPathElement();
 
-    this.buildZoomBtn();
 
-    let advanceActions = this.mapSchema.filter(x => x.type == 'code');
-    for (let code of advanceActions) {
-      this.mapBuilder.advanceAction(code.attrs.code);
-    }
+
+    this.buildZoomBtn();
 
     let bubbles = this.mapSchema.filter(x => x.type == 'bubble');
     for (let bubble of bubbles) {
@@ -120,11 +105,6 @@ export class MapDesignerComponent implements OnInit {
 
   addBubbles(name: string, parent: string, selectAll: string, data: any[], elementType: string, config: any) {
     this.mapBuilder.dataSetBuildElements(name, parent, selectAll, data, elementType, config);
-  }
-
-  addCode(){
-    console.log({name:"code",type:"code",attrs:{code:""},advance:{}})
-    this.mapSchema.push({name:"code",type:"code",attrs:{code:""},advance:{}});
   }
 
   buildProjection() {
@@ -260,7 +240,7 @@ export class MapDesignerComponent implements OnInit {
       .select("body")
       .append("div")
       .attr("class", "tooltip")
-      .style("opacity", 0)
+      .style("opacity", 1)
       .style("background-color", "white")
       .style("border", "solid")
       .style("border-width", "2px")
@@ -268,47 +248,38 @@ export class MapDesignerComponent implements OnInit {
       .style("padding", "5px")
       .style("position", "absolute");
   }
-
-  removeElement(text) {
-    console.log(text);
-    if (this.map[text]) {
-      this.map[text].remove();
-      this.mapSchema.splice(this.mapSchema.findIndex(x => x.name == text), 1);
-    }
-    else {
-      alert("not found element");
-    }
+  buildZoom() {
+    this.zoom = d3
+      .zoom()
+      .on("zoom", event => {
+        // event.transform.k = this.k;
+        
+        this.map['scaleBarZoom'].zoomFactor(event.transform.k); //比例尺設定改變(刻度)
+        this.map["bar"].call(this.map['scaleBarZoom']); //rebuild 比例尺
+        this.map["pathGroup"].attr("transform", event.transform);
+        let bubbles = this.mapSchema.filter(x => x.type == 'bubble');
+        for (let bubble of bubbles) {
+          this.map[bubble.name].attr("transform", event.transform);
+        }
+      })
+      .scaleExtent([1, 40]);
   }
 
-  attrKeys(schema: any) {
-    return Object.keys(schema.attrs);
-  }
-
-  saveSchema() {
-    let body = {};
-    this.mapSchemaInfo.Schema = JSON.stringify(this.mapSchema)
-    body["MapSchema"] = this.mapSchemaInfo;
-    body["DataSets"] = [];
-    // this.http.patch(`${this.baseUrl()}/MapSchema`, { Id: 1, Name: 'Demo', Schema: JSON.stringify(this.mapSchema) }, {}).subscribe(res => {
-    //   console.log(res)
-    // });
-    let dataSets = this.dataSets.filter(x => x.DataType != 1);
-    console.log(dataSets)
-    for (let data of dataSets) {
-      let save: any = {};
-      save.DataSetId = data.DataSetId;
-      save.DataType = data.DataType;
-      save.Name = data.name;
-      save.Schema = data.schema.join(',');
-      save.Data = JSON.stringify(data.data);
-      body["DataSets"].push(save);
-      // this.http.patch(`${this.baseUrl()}/DataSet`, save).subscribe(res => { }, error => { });
-    }
-    // this.http.patch(`${this.baseUrl()}/MapSchema/MapDesigner`, body).subscribe(res => { this.openSnackBar("Save Successed!") }, error => {
-    //   this.openSnackBar("Save Failed");
-    // });
-    this.mapSchemaService.SaveMapDesignerInfo(body).subscribe(res => { this.openSnackBar("Save Successed!") }, error => {
-      this.openSnackBar("Save Failed");
+  buildZoomBtn() {
+    d3.select("#zoom_in").on("click", () => {
+      if (this.k <= 10) {
+        this.k += 2;
+        this.centerScale();
+      }
+    });
+    d3.select("#zoom_out").on("click", () => {
+      if (this.k >= 3) {
+        this.k -= 2;
+        this.centerScale();
+      }
+    });
+    d3.select("#zoom_none").on("click", () => {
+      this.map['clicked'](null);
     });
   }
 
@@ -356,57 +327,4 @@ export class MapDesignerComponent implements OnInit {
         .style("stroke-width", bubble.attrs.strokeWidth + "px").attr("r", 3);
     }
   }
-
-  buildZoom() {
-    this.zoom = d3
-      .zoom()
-      .on("zoom", event => {
-        // event.transform.k = this.k;
-        
-        this.map['scaleBarZoom'].zoomFactor(event.transform.k); //比例尺設定改變(刻度)
-        this.map["bar"].call(this.map['scaleBarZoom']); //rebuild 比例尺
-        this.map["pathGroup"].attr("transform", event.transform);
-        let bubbles = this.mapSchema.filter(x => x.type == 'bubble');
-        for (let bubble of bubbles) {
-          this.map[bubble.name].attr("transform", event.transform);
-        }
-      })
-      .scaleExtent([1, 40]);
-  }
-
-  buildZoomBtn() {
-    d3.select("#zoom_in").on("click", () => {
-      if (this.k <= 10) {
-        this.k += 2;
-        this.centerScale();
-      }
-    });
-    d3.select("#zoom_out").on("click", () => {
-      if (this.k >= 3) {
-        this.k -= 2;
-        this.centerScale();
-      }
-    });
-    d3.select("#zoom_none").on("click", () => {
-      this.map['clicked'](null);
-    });
-  }
-  openDialog(DataSetId: string | number): void {
-    let data = this.dataSets.find(x => x.DataSetId == DataSetId);
-    const dialogRef = this.dialog.open(DataEditorComponent, {
-      width: '50vw',
-      data: { schema: data.schema, data: data.data }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-      // this.table = result;
-    });
-  }
-  openSnackBar(message: string) {
-    this._snackBar.open(message, null, {
-      duration: 2000,
-    });
-  }
 }
-

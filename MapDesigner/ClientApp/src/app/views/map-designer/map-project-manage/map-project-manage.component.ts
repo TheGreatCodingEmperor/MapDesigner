@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { ProjectEditorComponent } from '../components/project-editor/project-editor.component';
 import { DataSet } from '../models/dataset';
@@ -21,6 +22,7 @@ export class MapProjectManageComponent implements OnInit {
   constructor(
     private mapShcemaService: MapSchemaService,
     private dataSetService:DatasetService,
+    private _snackBar:MatSnackBar,
     private router: Router,
     public dialog: MatDialog,
   ) { }
@@ -58,7 +60,28 @@ export class MapProjectManageComponent implements OnInit {
       if(!result)return;
       this.mapShcemaService.SaveProject(result).subscribe(res=>{
         this.getList();
+        this.openSnackBar("Save Successed!");
+      },error=>{
+        this.openSnackBar("Save Failed!");
       });
+    });
+  }
+
+  removeProject(Id:number|string){
+    console.log(Id);
+    this.mapShcemaService.DeleteProject(Id).subscribe(
+      res=>{
+        this.openSnackBar("Delete Successed!");
+        this.getList();
+      },error=>{
+        this.openSnackBar("Delete Failed!");
+      }
+    );
+  }
+
+  openSnackBar(message: string) {
+    this._snackBar.open(message, null, {
+      duration: 2000,
     });
   }
 }

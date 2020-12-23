@@ -47,7 +47,7 @@ namespace MapDesigner.Helpers{
         {
             var keyProperty = typeof(T).GetProperties().FirstOrDefault(x => x.GetCustomAttributes().Any(a => ((KeyAttribute)a) != null));
             var rmItem = context.Set<T>().SingleOrDefault ($"{keyProperty.Name} = {key}");
-            context.Remove(rmItem);
+            context.Set<T>().Remove(rmItem);
             if(!transaction){
                 context.SaveChanges();
             }

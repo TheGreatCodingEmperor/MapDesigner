@@ -101,7 +101,7 @@ export class D3BuildHelper implements IMapBuilder {
         throw new Error('Method not implemented.');
     }
     advanceAction(code: string) {
-        throw new Error('Method not implemented.');
+        eval(code);
     }
     buildPath = (code: string, data: any[], tag: string, config: any) => {
         data = this.deepClone(data);

@@ -1,12 +1,19 @@
 <mat-drawer-container fxLayout="row">
-
+  <!-- 座測參數設定bar -->
   <mat-drawer #drawer mode="side" fxFlex="30%">
+    <!-- 切換element參數頁籤 -->
     <mat-tab-group animationDuration="0ms">
       <mat-tab label="{{config.name}}" *ngFor="let config of mapSchema" [ngSwitch]="config.type">
+        <!-- path 特殊參數 -->
         <div *ngSwitchCase="'path'">
+          <!-- data 前處理 -->
           <label matTooltip="dataSet 前處理">code</label>
           <ace-editor [(ngModel)]="config.code" style="height:150px;">
           </ace-editor>
+          <mat-form-field appearance="legacy">
+            <mat-label>DataTag</mat-label>
+            <input matInput type="text" [(ngModel)]="config.tag">
+          </mat-form-field>
         </div>
         <div *ngSwitchCase="'bubble'">
           <button mat-mini-fab (click)="openDialog(config.DataSetId)" matTooltip="dataSet 編輯">
@@ -27,6 +34,10 @@
             </ace-editor>
           </p>
         </div>
+      </mat-tab>
+      <mat-tab label="Action">
+        <button (click)="openBubbleDialog()">add bubbles</button>
+        <button (click)="addCode()">add code</button>
       </mat-tab>
     </mat-tab-group>
     <div style="position: absolute;bottom: 0px;z-index: 2;">
@@ -63,7 +74,9 @@
       <mat-icon matTooltip="open" *ngIf="!drawer.opened">keyboard_arrow_right</mat-icon>
       <mat-icon matTooltip="close" *ngIf="drawer.opened">keyboard_arrow_left</mat-icon>
     </button>
-    <button mat-raised-button matTooltip="Save" (click)="saveSchema()"><mat-icon>save</mat-icon></button>
+    <button mat-raised-button matTooltip="Save" (click)="saveSchema()">
+      <mat-icon>save</mat-icon>
+    </button>
   </mat-drawer-content>
 
 </mat-drawer-container>

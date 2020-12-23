@@ -14,6 +14,9 @@ export class DatasetService {
   SaveDataset(body:any):Observable<any>{
     return this.http.patch(`${this.baseUrl()}/DataSet`, body);
   }
+  DeleteDataset(id:number|string):Observable<any>{
+    return this.http.delete(`${this.baseUrl()}/DataSet/${id}`);
+  }
 
   public baseUrl() {
     let base = '';
