@@ -1,0 +1,35 @@
+<mat-dialog-content class="mat-typography">
+    <!-- element 名稱 -->
+    <mat-form-field appearance="legacy">
+        <mat-label>Name</mat-label>
+        <input matInput [(ngModel)]="data.element.name" placeholder="Name">
+    </mat-form-field>
+
+    <!-- 位置 Dataset -->
+    <mat-form-field appearance="legacy">
+        <mat-label>Location DataSet</mat-label>
+        <mat-select [(ngModel)]="data.element.DataSetId">
+            <mat-option *ngFor="let option of data.dataSets" [value]="option.value">{{option.label}}</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-radio-group aria-label="Coordinate/AreaId" [(ngModel)]="isCoor">
+        <mat-radio-button [value]="true">Coordinate</mat-radio-button>
+        <mat-radio-button [value]="false">AreaId</mat-radio-button>
+    </mat-radio-group>
+
+    <!-- type -->
+    <mat-form-field appearance="legacy">
+        <mat-label>Type</mat-label>
+        <mat-select [(ngModel)]="data.element.type">
+            <mat-option value="bubble">Bubble</mat-option>
+        </mat-select>
+    </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <!-- (click)="onNoClick()" -->
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-button (click)="close()" cdkFocusInitial>Save</button>
+    <!-- [mat-dialog-close]="data.element"  -->
+</mat-dialog-actions>

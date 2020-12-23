@@ -14,6 +14,7 @@ import { ProjectEditorComponent } from './components/project-editor/project-edit
 import { DatasetEditorComponent } from './components/dataset-editor/dataset-editor.component';
 import { TestComponent } from './test/test.component';
 import { MapPreviewComponent } from './map-preview/map-preview.component';
+import { ElementEditorComponent } from './components/element-editor/element-editor.component';
 
 
 @NgModule({
@@ -24,13 +25,14 @@ import { MapPreviewComponent } from './map-preview/map-preview.component';
     DatasetManageComponent, 
     TopojsonEditorComponent, 
     ProjectEditorComponent, 
-    DatasetEditorComponent, TestComponent, MapPreviewComponent
+    DatasetEditorComponent, TestComponent, MapPreviewComponent, ElementEditorComponent
   ],
   entryComponents:[
     DataEditorComponent,
     TopojsonEditorComponent,
     ProjectEditorComponent,
-    DatasetEditorComponent
+    DatasetEditorComponent,
+    ElementEditorComponent
   ],
   imports: [
     CommonModule,

@@ -176,3 +176,32 @@ export class D3BuildHelper implements IMapBuilder {
             fillOpacity:'number'
         };
 }
+
+export class BubbleTemplate{
+    type="bubble";
+    name="";
+    DataSetId=null;
+    attrs={
+        "cx": "this.map[\"projection\"]([d.long, d.lat])[0]; //座標轉 xy 軸 x",
+		"cy": "this.map[\"projection\"]([d.long, d.lat])[1]; //座標轉 xy 軸 y",
+		"r": "5",
+		"stroke": "#00ffcc",
+		"strokeWidth": "0.25",
+		"fillOpacity": "0.8",
+		"fill": "'red'",
+		"mouseover": "this.map[\"tooltip\"].style(\"opacity\", 1);",
+		"mousemove": " this.map[\"tooltip\"].html().style(\"top\", e.pageY + \"px\");",
+		"mouseleave": "this.map[\"tooltip\"].style(\"opacity\", 0);",
+		"click": "this.map.clicked(d)"
+    }
+    advance= {
+		"fill": true,
+		"mousemove": true,
+		"cx": true,
+		"cy": true,
+		"stroke": false,
+		"mouseover": true,
+		"mouseleave": true,
+		"click": true
+	}
+}

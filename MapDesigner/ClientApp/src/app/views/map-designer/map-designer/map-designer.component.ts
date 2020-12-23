@@ -3,13 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import * as d3 from "d3";
 import * as t from "topojson";
 import * as d3GeoBar from "d3-geo-scale-bar";
-import { D3BuildHelper } from 'src/app/helpers/d3-build-helper';
+import { BubbleTemplate, D3BuildHelper } from 'src/app/helpers/d3-build-helper';
 import { MatDialog } from '@angular/material/dialog';
 import { DataEditorComponent } from '../components/data-editor/data-editor.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 import { MapSchemaService } from '../services/map-schema.service';
 import { MapSchema } from '../models/map-schema';
+import { ElementEditorComponent } from '../components/element-editor/element-editor.component';
 
 
 @Component({
@@ -122,9 +123,9 @@ export class MapDesignerComponent implements OnInit {
     this.mapBuilder.dataSetBuildElements(name, parent, selectAll, data, elementType, config);
   }
 
-  addCode(){
-    console.log({name:"code",type:"code",attrs:{code:""},advance:{}})
-    this.mapSchema.push({name:"code",type:"code",attrs:{code:""},advance:{}});
+  addCode() {
+    console.log({ name: "code", type: "code", attrs: { code: "" }, advance: {} })
+    this.mapSchema.push({ name: "code", type: "code", attrs: { code: "" }, advance: {} });
   }
 
   buildProjection() {
@@ -192,7 +193,8 @@ export class MapDesignerComponent implements OnInit {
       .size([this.width, this.height])
       .left(config.attrs.left)
       .top(config.attrs.top)
-      .tickFormat(d => d3.format(",")(Math.round(d)));
+      .units(d3GeoBar.geoScaleKilometers)
+    .tickFormat(d => d3.format(",")(Math.round(d)));
 
     this.map["bar"] = this.map["svg"]
       .append("g")
@@ -362,7 +364,7 @@ export class MapDesignerComponent implements OnInit {
       .zoom()
       .on("zoom", event => {
         // event.transform.k = this.k;
-        
+
         this.map['scaleBarZoom'].zoomFactor(event.transform.k); //比例尺設定改變(刻度)
         this.map["bar"].call(this.map['scaleBarZoom']); //rebuild 比例尺
         this.map["pathGroup"].attr("transform", event.transform);
@@ -406,6 +408,19 @@ export class MapDesignerComponent implements OnInit {
   openSnackBar(message: string) {
     this._snackBar.open(message, null, {
       duration: 2000,
+    });
+  }
+  openElementDialog() {
+    const dialogRef = this.dialog.open(ElementEditorComponent, {
+      width: '50vw',
+      data: { element: new BubbleTemplate, dataSets: this.dataSets.map(x => { return { label: x.name, value: x.DataSetId } }) }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+      if (!result) return;
+      console.log(result);
+      this.mapSchema.push(result);
     });
   }
 }

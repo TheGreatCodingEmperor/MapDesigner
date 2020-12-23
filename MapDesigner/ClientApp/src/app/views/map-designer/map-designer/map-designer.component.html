@@ -18,6 +18,9 @@
         <div *ngSwitchCase="'bubble'">
           <button mat-mini-fab (click)="openDialog(config.DataSetId)" matTooltip="dataSet 編輯">
             <mat-icon>table_chart</mat-icon>
+          </button> 
+          <button mat-raised-button color="warn" matTooltip="移除 element" (click)="removeElement(config.name)">
+            <mat-icon>delete</mat-icon>
           </button>
           <!-- <button (click)="openDialog(config.DataSetId)"><mat-icon>table_chart</mat-icon></button> -->
         </div>
@@ -36,8 +39,12 @@
         </div>
       </mat-tab>
       <mat-tab label="Action">
-        <button (click)="openBubbleDialog()">add bubbles</button>
-        <button (click)="addCode()">add code</button>
+        <div style="width:180px">
+          <button mat-flat-button color="primary" (click)="openElementDialog()">Add Element</button>
+        </div>
+        <!-- <div>
+          <button mat-flat-button color="accent" (click)="addCode()">Add code</button>
+        </div> -->
       </mat-tab>
     </mat-tab-group>
     <div style="position: absolute;bottom: 0px;z-index: 2;">
