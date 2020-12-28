@@ -1,15 +1,9 @@
-import { Component, ViewChild, ElementRef, OnInit, AfterViewInit, AfterContentInit, AfterViewChecked, AfterContentChecked } from '@angular/core';
-import {
-  Compiler,
-  ComponentFactory,
-  ComponentFactoryResolver,
-  ComponentRef,
-  Input,
-  ModuleWithComponentFactories,
-  NgModule,
-  ViewContainerRef
-} from '@angular/core';
-declare var $ : any;
+import { Component, ViewChild, ElementRef, OnInit, AfterViewInit } from '@angular/core';
+
+import { ActivatedRoute } from '@angular/router';
+import { JoinHelper } from 'src/app/helpers/join-helper';
+import { MapdatasService } from '../services/mapdatas.service';
+declare var $: any;
 
 
 @Component({
@@ -17,24 +11,49 @@ declare var $ : any;
   templateUrl: './dataset-join-editor.component.html',
   styleUrls: ['./dataset-join-editor.component.css']
 })
-export class DatasetJoinEditorComponent implements AfterViewInit {
-  @ViewChild('exampleDiv',{static:true}) exampleDiv: ElementRef;
+export class DatasetJoinEditorComponent implements AfterViewInit, OnInit {
+  @ViewChild('exampleDiv', { static: true }) exampleDiv: ElementRef;
+  tables = [
+    { name: "table", cols: ["a", "b", "c"] },
+    { name: "table1", cols: [] },
+    { name: "table2", cols: [] },
+    { name: "table3", cols: [] },
+    { name: "table4", cols: [] },
+    { name: "table5", cols: [] },
+  ];
+  displayTables = [];
+  selectTables = [];
   public diagModel: any;
 
   private cx: number;
   private cy: number;
 
+  table: any = null;
+  index: number = null;
 
+  private joinHelper = new JoinHelper;
 
+  constructor(private mapdatasService: MapdatasService, private route: ActivatedRoute) { }
 
-  constructor() {
+  ngOnInit() {
+    let mapId = this.route.snapshot.queryParamMap.get("Id") as string;
+    this.mapdatasService.GetMapDataSetsSchema(mapId).subscribe(res => {
+      this.tables = res.map(x => {
+        let cols = [];
+        if (x.schema) {
+          cols = x.schema.split(",");
+        }
+        return {
+          name: x.name,
+          cols: cols
+        }
+      });
+      console.log(this.tables);
+      this.displayTables = this.tables;
+    })
   }
 
-
-
   ngAfterViewInit() {
-
-
     var container = $('#chart_container');
     this.cx = ($('#exampleDiv') as any).width() / 2;
     this.cy = ($('#exampleDiv') as any).height() / 2;
@@ -65,130 +84,35 @@ export class DatasetJoinEditorComponent implements AfterViewInit {
       });
 
     }, 1000);
-
   }
-
-
-  getOperatorData($element) {
-    var nbInputs = parseInt($element.data('nb-inputs'));
-    var nbOutputs = parseInt($element.data('nb-outputs'));
-    var data = {
-      properties: {
-        title: $element.text(),
-        inputs: {},
-        outputs: {}
-      }
-    };
-
-    var i = 0;
-    for (i = 0; i < nbInputs; i++) {
-      data.properties.inputs['input_' + i] = {
-        label: 'Input ' + (i + 1)
-      };
-    }
-    for (i = 0; i < nbOutputs; i++) {
-      data.properties.outputs['output_' + i] = {
-        label: 'Output ' + (i + 1)
-      };
-    }
-
-    return data;
+  refreshTables() {
+    console.log("refresh")
+    console.log(this.selectTables);
+    console.log(this.tables);
+    this.displayTables = this.tables.filter(x => !this.selectTables.includes(x))
   }
-
-
-
-  operatorI = 0;
-  operatorII = 0;
   addNewOperator() {
-
-    var operatorId = 'created_operator_' + this.operatorI;
-    var operatorData = {
-      top: this.cx,
-      left: this.cy,
-      properties: {
-        title: 'Operator ' + (this.operatorI + 3),
-        class: 'flowchart-operators',
-        inputs: {
-          input_1: {
-            label: 'Output 1',
-          },
-          input_2: {
-            label: 'Output 2',
-          },
-          input_3: {
-            label: 'Output 3',
-          },
-          input_4: {
-            label: 'Output 4',
-          },
-        },
-        outputs: {
-          output_1: {
-            label: 'Output 1',
-          },
-          output_2: {
-            label: 'Output 2',
-          },
-          output_3: {
-            label: 'Output 3',
-          },
-          output_4: {
-            label: 'Output 4',
-          },
-        }
-      }
-    }
-
-    this.operatorI++;
-    ($(this.exampleDiv.nativeElement) as any).flowchart('createOperator', operatorId, operatorData);
+    this.joinHelper.AddOperator($(this.exampleDiv.nativeElement), "test", this.cx, this.cy, []);
   }
-
-  addNewOperator2() {
-
-    var operatorId = 'created_operator_' + this.operatorI;
-    var operatorData = {
-      top: this.cx,
-      left: this.cy,
-      properties: {
-        title: 'Operator ' + (this.operatorI + 3),
-        class: 'flowchart-operators',
-        inputs: {
-          input_1: {
-            label: 'Input 1',
-          },
-          input_2: {
-            label: 'Input 2',
-          },
-          input_3: {
-            label: 'Input 3',
-          },
-        },
-        outputs: {}
-      }
-    }
-
-    this.operatorI++;
-    ($(this.exampleDiv.nativeElement) as any).flowchart('createOperator', operatorId, operatorData);
-  }
-
-
-
   deleteOperationOrLink() {
-    ($(this.exampleDiv.nativeElement) as any).flowchart('deleteSelected');
+    let selectTable = this.joinHelper.GetSelectedOperatorId($(this.exampleDiv.nativeElement));
+    this.selectTables = this.selectTables.filter(x => x.name != selectTable);
+    this.refreshTables();
+    this.joinHelper.Delete($(this.exampleDiv.nativeElement));
   }
-
-  load() {
-    ($(this.exampleDiv.nativeElement) as any).flowchart('deleteSelected');
-    var data = JSON.parse(this.diagModel);
-    ($(this.exampleDiv.nativeElement) as any).flowchart('setData', data);
-  }
-
-
   get() {
-    ($(this.exampleDiv.nativeElement) as any).flowchart('deleteSelected');
-    var data = ($(this.exampleDiv.nativeElement) as any).flowchart('getData');
-    this.diagModel = JSON.stringify(data, null, 2);
+    console.log(this.joinHelper.GetDatas($(this.exampleDiv.nativeElement)))
   }
-
+  dragstart(table: any, index: number) {
+    this.table = table;
+    this.index = index;
+  }
+  dragover(ev) {
+    ev.preventDefault();
+  }
+  drop(ev) {
+    this.selectTables.push(this.table);
+    this.refreshTables();
+    this.joinHelper.AddOperator($(this.exampleDiv.nativeElement), this.table.name, this.cx / 2 + ev.pageY, this.cy / 2 + ev.pageX, this.table.cols);
+  }
 }
-

@@ -13,6 +13,7 @@
 
 <mat-dialog-actions align="end">
     <!-- (click)="onNoClick()" -->
+    <button mat-button (click)="getoJoin()">join</button>
     <button mat-button mat-dialog-close>Cancel</button>
     <button mat-button [mat-dialog-close]="data.project" cdkFocusInitial>Save</button>
 </mat-dialog-actions>

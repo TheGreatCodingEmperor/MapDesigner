@@ -28,10 +28,28 @@ namespace MapDesigner.Controllers {
         }
 
         [HttpGet("datasets/{mapId}")]
+        /// <summary>
+        /// 取得該專案所有 dataset ID 
+        /// </summary>
+        /// <param name="mapId">專案編號</param>
+        /// <returns></returns>
         public async Task<IActionResult> GetMapDataSets([FromRoute] int mapId){
             var mapSchema = _efcorHelper.GetList<MapDatas>(_mapContext).Where(x => x.MapId == mapId).Select(x => x.DataSetId).ToList();
             await Task.CompletedTask;
             return Ok(mapSchema);
+        }
+
+        [HttpGet("datasets/schema/{mapId}")]
+        /// <summary>
+        /// 取得該專案所有 dataset ID 
+        /// </summary>
+        /// <param name="mapId">專案編號</param>
+        /// <returns></returns>
+        public async Task<IActionResult> GetMapDataSetsSchema([FromRoute] int mapId){
+            var mapSchema = _efcorHelper.GetList<MapDatas>(_mapContext).Where(x => x.MapId == mapId).Select(x => x.DataSetId).ToList();
+            var schemas = _efcorHelper.GetList<DataSet>(_mapContext).Where(x => mapSchema.Contains(x.DataSetId)).AsNoTracking().Select(x => new {Name=x.Name,Schema = x.Schema});
+            await Task.CompletedTask;
+            return Ok(schemas);
         }
 
         [HttpPost("innerJoin")]

@@ -10,14 +10,19 @@ declare var $ : any;
 export class TestComponent implements AfterViewInit {
   @ViewChild('exampleDiv',{static:true}) exampleDiv: ElementRef;
   tables = [
-    "table","table1","table2","table3","table4","table5",
+    {name:"table",cols:["a","b","c"]},
+    {name:"table1",cols:[]},
+    {name:"table2",cols:[]},
+    {name:"table3",cols:[]},
+    {name:"table4",cols:[]},
+    {name:"table5",cols:[]},
   ];
   public diagModel: any;
 
   private cx: number;
   private cy: number;
 
-  name:string = null;
+  table:any = null;
   index:number = null;
 
   private joinHelper = new JoinHelper;
@@ -57,16 +62,17 @@ export class TestComponent implements AfterViewInit {
     }, 1000);
   }
   addNewOperator(){
-    this.joinHelper.AddOperator($(this.exampleDiv.nativeElement),"test",this.cx,this.cy);
+    this.joinHelper.AddOperator($(this.exampleDiv.nativeElement),"test",this.cx,this.cy,[]);
   }
   deleteOperationOrLink(){
+    this.tables.push(this.joinHelper.GetSelectedOperatorId($(this.exampleDiv.nativeElement)));
     this.joinHelper.Delete($(this.exampleDiv.nativeElement));
   }
   get(){
     console.log(this.joinHelper.GetDatas($(this.exampleDiv.nativeElement)))
   }
-  dragstart(name:string,index:number){
-    this.name = name;
+  dragstart(table:any,index:number){
+    this.table = table;
     this.index = index;
   }
   dragover(ev){
@@ -74,6 +80,6 @@ export class TestComponent implements AfterViewInit {
   }
   drop(ev){
     this.tables.splice(this.index,1);
-    this.joinHelper.AddOperator($(this.exampleDiv.nativeElement),this.name,this.cx/2+ev.pageY,this.cy/2+ev.pageX);
+    this.joinHelper.AddOperator($(this.exampleDiv.nativeElement),this.table.name,this.cx/2+ev.pageY,this.cy/2+ev.pageX,this.table.cols);
   }
 }

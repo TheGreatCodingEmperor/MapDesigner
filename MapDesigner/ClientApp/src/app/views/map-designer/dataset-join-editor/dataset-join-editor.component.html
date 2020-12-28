@@ -1,17 +1,24 @@
+<mat-drawer-container fxLayout="row">
+  <mat-drawer #cols mode="side" position="end" fxFlex="30%">
+      <ul>
+          <li *ngFor="let table of displayTables;let i = index;" draggable="true" (dragstart)="dragstart(table,i)">{{table.name}}
+          </li>
+      </ul>
+  </mat-drawer>
+  <mat-drawer-content fxFlex="70%" style="position: relative;">
 
-<div id="chart_container" #chart_container>
-  <!-- <pan-zoom [config]="panzoomConfig"> -->
-  <div class="flowchart-example-container" id="exampleDiv" #exampleDiv></div>
-  <!-- </pan-zoom> -->
-</div>
+      <div (dragover)="dragover($event)" (drop)="drop($event)" id="chart_container" #chart_container>
+          <!-- <pan-zoom [config]="panzoomConfig"> -->
+          <div class="flowchart-example-container" id="exampleDiv" #exampleDiv></div>
+          <!-- </pan-zoom> -->
+      </div>
 
-
-
-<input type="button" value="add operator" (click)="addNewOperator()">
-<input type="button" value="add operator2" (click)="addNewOperator2()">
-<input type="button" value="delete" (click)="deleteOperationOrLink()">
-<input type="button" value="load" (click)="load()">
-<input type="button" value="get" (click)="get()">
-<br />
-<textarea nbInput fullWidth shape="round" name="diagModel" [(ngModel)]="diagModel" placeholder="model"
-  style="height: 300px; width: 500px"></textarea>
+      <!-- <input type="button" value="add operator" (click)="addNewOperator()"> -->
+      <input type="button" value="delete" (click)="deleteOperationOrLink()">
+      <input type="button" value="get" (click)="get()">
+      <button mat-raised-button color="primary" (click)="cols.toggle()">
+          <mat-icon matTooltip="open" *ngIf="!cols.opened">keyboard_arrow_left</mat-icon>
+          <mat-icon matTooltip="close" *ngIf="cols.opened">keyboard_arrow_right</mat-icon>
+      </button>
+  </mat-drawer-content>
+</mat-drawer-container>

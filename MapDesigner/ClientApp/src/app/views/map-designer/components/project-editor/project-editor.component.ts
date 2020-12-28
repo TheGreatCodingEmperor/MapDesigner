@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { DataSet } from '../../models/dataset';
 import { MapProject, MapSchema } from '../../models/map-schema';
 
@@ -12,12 +13,19 @@ export class ProjectEditorComponent implements OnInit {
   mapDatas = [];
 
   constructor(public dialogRef: MatDialogRef<ProjectEditorComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: {project:MapProject,datalist:DataSet[]}) { console.log(data) }
+    @Inject(MAT_DIALOG_DATA) public data: {project:MapProject,datalist:DataSet[]},
+    private router:Router
+    ) { console.log(data) }
 
   ngOnInit() {
   }
 
   onNoClick(): void {
     this.dialogRef.close(this.data.project);
+  }
+
+  getoJoin(){
+    this.router.navigate(["/map/join"],{queryParams:{Id:this.data.project.Map.Id}});
+    this.dialogRef.close();
   }
 }

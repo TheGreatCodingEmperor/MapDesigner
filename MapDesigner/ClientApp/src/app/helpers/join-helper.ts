@@ -1,50 +1,36 @@
 export interface IJoinHelper {
-    AddOperator(element: any, name: string, cx: number, cy: number): any;
+    AddOperator(element: any, name: string, cx: number, cy: number,cols:string[]): any;
     Delete(element:any): any;
+    GetSelectedOperatorId(element:any):any;
     GetDatas(element:any): any;
     SetDatas(): any;
 }
 export class JoinHelper implements IJoinHelper {
-    AddOperator(element: any, name: string, cx: number, cy: number) {
-        var operatorId = 'created_operator_' + name;
+    AddOperator(element: any, name: string, cx: number, cy: number, cols:string[]) {
+        var operatorId = name;
+        let inputs = {}
+        let outputs = {};
+        for(let col of cols){
+            inputs[`${col}_in`] ={};
+            inputs[`${col}_in`]["label"] = col;
+            outputs[`${col}_out`] ={};
+            outputs[`${col}_out`]["label"] = col;
+        }
         var operatorData = {
             top: cx,
             left: cy,
             properties: {
-                title: 'Operator ' + name,
+                title: name,
                 class: 'flowchart-operators',
-                inputs: {
-                    input_1: {
-                        label: 'Output 1',
-                    },
-                    input_2: {
-                        label: 'Output 2',
-                    },
-                    input_3: {
-                        label: 'Output 3',
-                    },
-                    input_4: {
-                        label: 'Output 4',
-                    },
-                },
-                outputs: {
-                    output_1: {
-                        label: 'Output 1',
-                    },
-                    output_2: {
-                        label: 'Output 2',
-                    },
-                    output_3: {
-                        label: 'Output 3',
-                    },
-                    output_4: {
-                        label: 'Output 4',
-                    },
-                }
+                inputs: inputs,
+                outputs: outputs
             }
         }
         // this.operatorI++;
         element.flowchart('createOperator', operatorId, operatorData);
+    }
+    GetSelectedOperatorId(element:any){
+        return element.flowchart('getSelectedOperatorId');
     }
     Delete(element:any) {
         element.flowchart('deleteSelected');
