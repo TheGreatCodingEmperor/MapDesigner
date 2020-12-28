@@ -2,8 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DataSet } from '../../models/dataset';
 import * as XLSX from 'xlsx';
-import { json } from 'd3';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import * as t from "topojson";
 
 @Component({
   selector: 'app-dataset-editor',
@@ -40,7 +39,11 @@ export class DatasetEditorComponent implements OnInit {
       if (this.data.DataType == 0)
         this.dataPages = Object.keys(jsonData);
       else{
-        this.import = jsonData['Sheet1'];
+        this.import = data;
+        console.log(data)
+        let dataJson = JSON.parse(data as string);
+        dataJson.objects.towns.geometrics = dataJson.objects.towns.geometries.filter(x=>x.properties.COUNTYNAME=="高雄市")
+        console.log(JSON.stringify(t.feature(dataJson, dataJson.objects['towns']).features))
       }
       // const dataString = JSON.stringify(jsonData);
       // document.getElementById('output').innerHTML = dataString.slice(0, 300).concat("...");

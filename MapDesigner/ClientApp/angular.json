@@ -24,11 +24,17 @@
               "src/assets"
             ],
             "styles": [
-              "./node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css",
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "src/flowchartJs.css",
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [
+              "js/jquery.min.js",
+              "js/jquery-ui.min.js",
+              "js/jquery.panzoom.min.js",
+              "js/jquery.mousewheel.min.js",
+              "js/jquery.flowchart.min.js"
+            ]
           },
           "configurations": {
             "production": {

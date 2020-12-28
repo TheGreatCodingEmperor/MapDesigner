@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AppComponent } from 'src/app/app.component';
+import { DatasetJoinEditorComponent } from './dataset-join-editor/dataset-join-editor.component';
 import { DatasetManageComponent } from './dataset-manage/dataset-manage.component';
 import { MapDesignerComponent } from './map-designer/map-designer.component';
 import { MapPreviewComponent } from './map-preview/map-preview.component';
@@ -16,6 +17,7 @@ const routes: Routes = [
       { path:"dataset", component:DatasetManageComponent },
       { path:"test", component:TestComponent },
       { path:"view", component:MapPreviewComponent },
+      { path:"join", component: DatasetJoinEditorComponent }
     ]
   }
 ];

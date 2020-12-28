@@ -1,4 +1,15 @@
 <mat-drawer-container fxLayout="row">
+  <mat-drawer #cols mode="side" position="end" fxFlex="30%">
+    <ul *ngFor="let dataset of dataSets">
+      {{dataset.name}}
+        {{col}}
+        <li class="drag-col" *ngFor="let col of dataset.schema" (dragstart)="dragstart(dataset.name,col)" draggable="true">
+        {{col}}
+      </li>
+    </ul>
+  </mat-drawer>
+
+
   <!-- 座測參數設定bar -->
   <mat-drawer #drawer mode="side" fxFlex="30%">
     <!-- 切換element參數頁籤 -->
@@ -33,7 +44,7 @@
           <p *ngIf="config.advance[attr]">
             <label>{{attr}}<mat-icon matTooltip="常數設定" style="float: right;"
                 (click)="config.advance[attr]=!config.advance[attr]">code</mat-icon></label>
-            <ace-editor [(ngModel)]="config.attrs[attr]" style="height:150px;">
+            <ace-editor [(ngModel)]="config.attrs[attr]" style="height:150px;" (dragover)="allowDrop($event)" (drop)="drop($event,config,attr)">
             </ace-editor>
           </p>
         </div>
@@ -58,6 +69,7 @@
   </mat-drawer>
 
 
+
   <mat-drawer-content fxFlex="70%" style="position: relative;">
     <div class="d3-geomap" id="map" style="position: relative;">
       <div style="position: absolute;z-index:2;">
@@ -80,6 +92,10 @@
     <button mat-raised-button color="primary" (click)="drawer.toggle()">
       <mat-icon matTooltip="open" *ngIf="!drawer.opened">keyboard_arrow_right</mat-icon>
       <mat-icon matTooltip="close" *ngIf="drawer.opened">keyboard_arrow_left</mat-icon>
+    </button>
+    <button mat-raised-button color="primary" (click)="cols.toggle()">
+      <mat-icon matTooltip="open" *ngIf="!cols.opened">keyboard_arrow_left</mat-icon>
+      <mat-icon matTooltip="close" *ngIf="cols.opened">keyboard_arrow_right</mat-icon>
     </button>
     <button mat-raised-button matTooltip="Save" (click)="saveSchema()">
       <mat-icon>save</mat-icon>

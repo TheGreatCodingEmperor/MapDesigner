@@ -11,6 +11,7 @@ import { ActivatedRoute } from '@angular/router';
 import { MapSchemaService } from '../services/map-schema.service';
 import { MapSchema } from '../models/map-schema';
 import { ElementEditorComponent } from '../components/element-editor/element-editor.component';
+import { MatDrawer } from '@angular/material/sidenav';
 
 
 @Component({
@@ -28,6 +29,10 @@ export class MapDesignerComponent implements OnInit {
   mapSchemaInfo = new MapSchema;
   dataSets = [];
   zoom: any = null;
+
+  dragTmp = {
+    data:null,col:null
+  }
 
   constructor(
     public dialog: MatDialog,
@@ -422,6 +427,17 @@ export class MapDesignerComponent implements OnInit {
       console.log(result);
       this.mapSchema.push(result);
     });
+  }
+  allowDrop(ev) {
+    ev.preventDefault();
+  }
+  drop(e,config,attr){
+    // config.attrs[attr] += `d["${this.dragTmp.data}"]["${this.dragTmp.col}"]`
+    config.attrs[attr] += `d["${this.dragTmp.col}"]`
+  }
+  dragstart(data,col){
+    this.dragTmp.data = data;
+    this.dragTmp.col = col;
   }
 }
 

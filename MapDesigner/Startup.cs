@@ -28,6 +28,8 @@ namespace MapDesigner {
             );
 
             services.AddScoped<IBasicEfcoreHelper,BasicEfcoreHelper>();
+            services.AddScoped<IMapDesignHelper,MapDesignHelper>();
+            services.AddScoped<IDynamicCompileHelper,DynamicCompileHelper>();
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles (configuration => {
