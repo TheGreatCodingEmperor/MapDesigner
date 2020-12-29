@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using MapDesigner.Models;
 using Newtonsoft.Json;
 using Z.Expressions;
@@ -11,11 +11,11 @@ using Z.Expressions;
 namespace MapDesigner.Helpers {
     public interface IMapDesignHelper {
         public object InnerJoin (SqlQueryData a, SqlQueryData b, string aKeyName, string bKeyName);
-        public LogicLayerResponse MultiJoin (List<SqlQueryData> lists, JoinLine[] lines);
+        public LogicLayerResponse MultiJoin (string rawData, JoinLine[] lines);
     }
     public class MapDesignHelper : IMapDesignHelper {
-        private IDynamicCompileHelper _dynamicCompileHelper {get;}
-        public MapDesignHelper(IDynamicCompileHelper dynamic){
+        private IDynamicCompileHelper _dynamicCompileHelper { get; }
+        public MapDesignHelper (IDynamicCompileHelper dynamic) {
             _dynamicCompileHelper = dynamic;
         }
 
@@ -24,35 +24,49 @@ namespace MapDesigner.Helpers {
             from bRow in b.Data
             where JsonEquals (aRow[aKeyName], bRow[bKeyName])
             select new Dictionary<string, object> () {
-                [a.Name] = aRow, [b.Name] = bRow };
+                [a.Name] = aRow, [b.Name] = bRow
+            };
             return query;
         }
 
-        public LogicLayerResponse MultiJoin (List<SqlQueryData> lists, JoinLine[] lines) {
-            if(lists.Count()<2||lists.Count()!=lines.Length+1){
-                return new LogicLayerResponse(){Status=400,Result="Join relation Error!"};
+        public LogicLayerResponse MultiJoin (string raw, JoinLine[] lines) {
+            var data = JsonConvert.DeserializeObject<Dictionary<string, List<Dictionary<string, object>>>>(raw);
+            var result = new LogicLayerResponse ();
+            try {
+                var currentData = new List<string> ();
+                var tmp = "";
+                for (var i = 0; i < lines.Length; i++) {
+                    var fromTable = lines[i].FromeTableName;
+                    var toTable = lines[i].ToTableName;
+                    var fromCol = lines[i].FromColName;
+                    var toCol = lines[i].ToColName;
+                    if (i == 0) {
+                        tmp += $"data[\"{fromTable}\"].Join(data[\"{toTable}\"], {fromTable}=>{fromTable}[\"{fromCol}\"], {toTable}=>{toTable}[\"{toCol}\"], ({fromTable},{toTable})=>new{{{fromTable},{toTable}}})";
+                    } else {
+                        tmp += $".Join(data[\"{toTable}\"], query=>query.{fromTable}[\"{fromCol}\"], {toTable}=>{toTable}[\"{toCol}\"], (query,{toTable})=>new{{{Query2dTo1d(currentData.ToArray())}{toTable}}})";
+                    }
+                    if (currentData.FirstOrDefault (x => x == fromTable) == null) {
+                        currentData.Add (fromTable);
+                    }
+                    if (currentData.FirstOrDefault (x => x == toTable) == null) {
+                        currentData.Add (toTable);
+                    }
+                }
+                result.Status = 200;
+                result.Result = Eval.Execute (tmp, new { data = data });
+            } catch (Exception e) {
+                result.Status = 400;
+                result.Result = e.ToString ();
             }
-            
-            var fromTable = new List<string>();
-            var whereCon =new List<string>();
-            var selectData = new List<string>();
-            for(var i=0;i<lists.Count() ; i++){
-                fromTable.Add($"from {lists[i].Name} in data[{i}] ");
-                selectData.Add($"{lists[i].Name}={lists[i].Name}");
-            }
-            for(var i=0;i<lines.Count();i++){
-                whereCon.Add($"where {lines[i].FromeTableName}[FromColName[{i}]] == {lines[i].ToTableName}[ToColName[{i}]] ");
-            }
-            
-            var code = $"try{{ var query = {String.Join(" ",fromTable)} {String.Join(" ",whereCon)} Select new {{ {String.Join(",",selectData)} }};return query; }}catch(Exception e){{return e.ToString();}} ";
-            code = code.ToString();
-            var data = lists.Select(x => x.Data).ToArray();
-            var FromColName = lines.Select(x => x.FromColName).ToArray();
-            var ToColName = lines.Select(x => x.ToColName).ToArray();
-            var logicResult = Eval.Execute<dynamic>(code, new { data=data,FromColName = FromColName, ToColName = ToColName} );
-
-            var result = new LogicLayerResponse(){Status=200,Result = logicResult};
             return result;
+        }
+
+        public static string Query2dTo1d (string[] tables) {
+            var str = "";
+            foreach (var table in tables) {
+                str += $"query.{table},";
+            }
+            return str;
         }
 
         public bool JsonEquals (JsonElement x, JsonElement y) {

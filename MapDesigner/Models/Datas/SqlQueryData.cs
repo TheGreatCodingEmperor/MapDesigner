@@ -13,6 +13,6 @@ namespace MapDesigner.Models{
     }
     public class SqlQuery{
         public JoinLine[] Lines {get;set;}
-        public List<SqlQueryData> Datas {get;set;}
+        public object Datas {get;set;}
     }
 }

@@ -61,7 +61,7 @@ namespace MapDesigner.Controllers {
 
         [HttpPost("multiJoin")]
         public async Task<IActionResult> MultiJoin([FromBody] SqlQuery body ){
-            var result = _mapDesignHelper.MultiJoin(body.Datas,body.Lines);
+            var result = _mapDesignHelper.MultiJoin(body.Datas.ToString(),body.Lines);
             if(result.Status!=200){
                 return BadRequest(result.Result);
             }
