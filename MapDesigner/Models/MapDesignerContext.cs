@@ -6,6 +6,7 @@ public class MapDesignerContext : DbContext
     public MapDesignerContext(DbContextOptions<MapDesignerContext> options)
         : base(options)
     { }
+    public DbSet<JoinLines> JoinLines {get;set;}
     public DbSet<MapSchema> MapSchema { get; set; }
     public DbSet<DataSet> DataSet { get; set; }
     public DbSet<MapDatas> MapDatas { get; set; }

@@ -11,13 +11,14 @@ using Z.Expressions;
 namespace MapDesigner.Helpers {
     public interface IMapDesignHelper {
         public object InnerJoin (SqlQueryData a, SqlQueryData b, string aKeyName, string bKeyName);
-        public LogicLayerResponse MultiJoin (string rawData, JoinLine[] lines);
+        public LogicLayerResponse MultiJoin (Dictionary<string, List<Dictionary<string, object>>> data, JoinLine[] lines);
     }
     public class MapDesignHelper : IMapDesignHelper {
         private IDynamicCompileHelper _dynamicCompileHelper { get; }
         public MapDesignHelper (IDynamicCompileHelper dynamic) {
             _dynamicCompileHelper = dynamic;
         }
+
 
         public object InnerJoin (SqlQueryData a, SqlQueryData b, string aKeyName, string bKeyName) {
             var query = from aRow in a.Data
@@ -29,8 +30,7 @@ namespace MapDesigner.Helpers {
             return query;
         }
 
-        public LogicLayerResponse MultiJoin (string raw, JoinLine[] lines) {
-            var data = JsonConvert.DeserializeObject<Dictionary<string, List<Dictionary<string, object>>>>(raw);
+        public LogicLayerResponse MultiJoin (Dictionary<string, List<Dictionary<string, object>>> data, JoinLine[] lines) {
             var result = new LogicLayerResponse ();
             try {
                 var currentData = new List<string> ();

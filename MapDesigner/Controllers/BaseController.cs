@@ -45,7 +45,7 @@ namespace MapDesigner.Controllers {
         }
 
         [HttpDelete ("{Id}")]
-        public virtual async Task<IActionResult> DeleteDatasAPI ([FromRoute] Tkey Id) {
+        public virtual async Task<IActionResult> DeleteDataAPI ([FromRoute] Tkey Id) {
             await Task.CompletedTask;
             try{
                 _efCoreHelper.RemoveSingle<T,Tkey>(_mapContext,Id,false);

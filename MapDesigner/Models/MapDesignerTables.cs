@@ -19,4 +19,15 @@ public class MapDatas{
     public int Id {get;set;}
     public int MapId {get;set;}
     public int DataSetId {get;set;}
+    public int? Top {get;set;}
+    public int? Left {get;set;}
+}
+public class JoinLines{
+    [Key]
+    public long LineId {get;set;}
+    public int MapId {get;set;}
+    public int FromTableId {get;set;}
+    public string FromColName {get;set;}
+    public int ToTableId {get;set;}
+    public string ToColName {get;set;}
 }

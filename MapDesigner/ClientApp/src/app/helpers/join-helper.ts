@@ -1,24 +1,36 @@
+import { Injectable } from "@angular/core";
+
 export interface IJoinHelper {
-    AddOperator(element: any, name: string, cx: number, cy: number,cols:string[]): any;
-    Delete(element:any): any;
-    GetSelectedOperatorId(element:any):any;
-    GetDatas(element:any): any;
+    /** @summary 新增 table */
+    AddOperator(element: any, id: string | number, name: string, cx: number, cy: number, cols: string[]): any;
+    /** @summary 刪除 table/line */
+    Delete(element: any): any;
+    /** @summary 取得 tableId */
+    GetSelectedOperatorId(element: any): any;
+    /** @summary 取得 當前 jquery flowchart 設計結果 */
+    GetDatas(element: any): any;
     SetDatas(): any;
 }
+@Injectable({
+    providedIn: 'root'
+  })
 export class JoinHelper implements IJoinHelper {
-    AddOperator(element: any, name: string, cx: number, cy: number, cols:string[]) {
-        var operatorId = name;
+    /** @summary 新增 table */
+    AddOperator(element: any, id: string | number, name: string, cx: number, cy: number, cols: string[]) {
+        var operatorId = id;
         let inputs = {}
         let outputs = {};
-        for(let col of cols){
-            inputs[`${col}_in`] ={};
-            inputs[`${col}_in`]["label"] = col;
-            outputs[`${col}_out`] ={};
-            outputs[`${col}_out`]["label"] = col;
+        if (cols!=null) {
+            for (let col of cols) {
+                inputs[`${col}_in`] = {};
+                inputs[`${col}_in`]["label"] = col;
+                outputs[`${col}_out`] = {};
+                outputs[`${col}_out`]["label"] = col;
+            }
         }
         var operatorData = {
-            top: cx,
-            left: cy,
+            top: cy,
+            left: cx,
             properties: {
                 title: name,
                 class: 'flowchart-operators',
@@ -29,13 +41,16 @@ export class JoinHelper implements IJoinHelper {
         // this.operatorI++;
         element.flowchart('createOperator', operatorId, operatorData);
     }
-    GetSelectedOperatorId(element:any){
+    /** @summary 取得 tableId */
+    GetSelectedOperatorId(element: any) {
         return element.flowchart('getSelectedOperatorId');
     }
-    Delete(element:any) {
+    /** @summary 刪除 table/line */
+    Delete(element: any) {
         element.flowchart('deleteSelected');
     }
-    GetDatas(element:any) {
+    /** @summary 取得 當前 jquery flowchart 設計結果 */
+    GetDatas(element: any) {
         return element.flowchart('getData');
     }
     SetDatas() {

@@ -66,11 +66,11 @@ namespace MapDesigner.Controllers {
                     continue;
                 }
                 else{
-                    _efCoreHelper.RemoveSingle<MapDatas,int>(_mapContext,data.DataSetId,false);
+                    _efCoreHelper.RemoveSingle<MapDatas,int>(_mapContext,data.Id,true);
                 }
             }
             foreach(var data in body.DataSets){
-                _efCoreHelper.PatchSingle<MapDatas>(_mapContext, new MapDatas(){Id=0, MapId=body.Map.Id,DataSetId=data});
+                _efCoreHelper.PatchSingle<MapDatas>(_mapContext, new MapDatas(){Id=0, MapId=body.Map.Id,DataSetId=data},true);
             }
             await _mapContext.SaveChangesAsync();
             return Ok();

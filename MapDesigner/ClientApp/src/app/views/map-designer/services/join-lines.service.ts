@@ -5,15 +5,15 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class MapdatasService {
+export class JoinLinesService {
 
   constructor(protected http:HttpClient) { }
-  GetMapDataSetsSchema(mapId:string|number):Observable<any>{
-    return this.http.get(`${this.baseUrl()}/MapDatas/datasets/schema/${mapId}`);
-  }
-  MultiJoin(){
 
+  SaveJoinLineAndTables(body:any):Observable<any>{
+    return this.http.patch(`${this.baseUrl()}/JoinLines/SaveJoinLineAndTables`, body);
   }
+
+
   public baseUrl() {
     let base = '';
 

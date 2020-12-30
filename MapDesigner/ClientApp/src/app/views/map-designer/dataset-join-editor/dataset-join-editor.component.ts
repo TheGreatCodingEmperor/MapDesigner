@@ -4,7 +4,10 @@ import { ActivatedRoute } from '@angular/router';
 import { JoinHelper } from 'src/app/helpers/join-helper';
 import { MapdatasService } from '../services/mapdatas.service';
 declare var $: any;
-
+import * as d3 from "d3";
+import { JoinLinesService } from '../services/join-lines.service';
+import { JoinLines } from '../models/join-lines';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-dataset-join-editor',
@@ -13,54 +16,141 @@ declare var $: any;
 })
 export class DatasetJoinEditorComponent implements AfterViewInit, OnInit {
   @ViewChild('exampleDiv', { static: true }) exampleDiv: ElementRef;
-  tables = [
-    { name: "table", cols: ["a", "b", "c"] },
-    { name: "table1", cols: [] },
-    { name: "table2", cols: [] },
-    { name: "table3", cols: [] },
-    { name: "table4", cols: [] },
-    { name: "table5", cols: [] },
-  ];
+  /** @summary 此專案所有資料集 */
+  tables: { name: string, cols: string[], left?: number, top?: number }[] = [];
+  /** @summary 上一次為止設計資料及關係line */
+  lines: JoinLines[] = [];
+  /** @summary 此專案編號 */
+  mapId: number = 0;
+  /** @summary 可拖曳(未設計)資料集 */
   displayTables = [];
+  /** @summary 不可拖曳(已設計)資料集 */
   selectTables = [];
   public diagModel: any;
 
+  /** @summary 設計方框中心X */
   private cx: number;
+  /** @summary 設計方框中心Y */
   private cy: number;
 
+  /** @summary 拖曳中的 資料集(this.tables) */
   table: any = null;
+  /**  */
   index: number = null;
 
-  private joinHelper = new JoinHelper;
+  constructor(
+    private mapdatasService: MapdatasService,
+    private route: ActivatedRoute,
+    private joinLineService: JoinLinesService,
+    private _snackBar: MatSnackBar,
+    /** @summary Jquery FlowChart 功能封裝class */
+    private joinHelper: JoinHelper
 
-  constructor(private mapdatasService: MapdatasService, private route: ActivatedRoute) { }
+  ) { }
 
+  //#region Main
+  /**
+   * @summary 取得資料、build join ui 畫面
+   */
   ngOnInit() {
-    let mapId = this.route.snapshot.queryParamMap.get("Id") as string;
-    this.mapdatasService.GetMapDataSetsSchema(mapId).subscribe(res => {
-      this.tables = res.map(x => {
+    this.getMapIdAndLinesAndTables();
+  }
+
+  /** @summary 初始化jquery flowchart、 build 已設計畫面 */
+  ngAfterViewInit() {
+    this.initialFlowChartAndBuildLastDesign();
+  }
+  //#endregion Main
+
+
+  /** @summary 右方可拖曳欄位重新篩選 */
+  refreshTables() {
+    // console.log(this.selectTables)
+    this.displayTables = this.tables.filter(x => !this.selectTables.includes(x))
+  }
+
+  /** @summary UI刪除選取 table/line */
+  deleteOperationOrLink() {
+    let selectTableId = this.joinHelper.GetSelectedOperatorId($(this.exampleDiv.nativeElement));
+    this.selectTables = this.selectTables.filter(x => x.id != selectTableId);
+    this.refreshTables();
+    this.joinHelper.Delete($(this.exampleDiv.nativeElement));
+  }
+
+  /** @summary 儲存設計結果 table/line 到資料庫 */
+  save() {
+    this.saveLinesAndTables();
+  }
+
+  /** @summary 拖曳起始紀錄拖曳物件 */
+  dragstart(table: any, index: number) {
+    this.table = table;
+  }
+
+  /** @summary 拖曳 */
+  dragover(ev) {
+    ev.preventDefault();
+  }
+
+  /** @summary 拖曳結束 build UI table */
+  drop(ev) {
+    this.selectTables.push(this.table);
+    this.refreshTables();
+    // console.log(ev.pageX);
+    // console.log(ev);
+    this.joinHelper.AddOperator($(this.exampleDiv.nativeElement), this.table.id, this.table.name, ev.offsetX, ev.offsetY, this.table.cols);
+  }
+
+  /** @summary 互動彈跳文字視窗 */
+  openSnackBar(message: string) {
+    this._snackBar.open(message, null, {
+      duration: 2000,
+    });
+  }
+
+
+  //#region 封裝Method
+  /** @summary 取得 Map、lines、tables */
+  getMapIdAndLinesAndTables() {
+    //從url 取得專案編號
+    this.mapId = Number(this.route.snapshot.queryParamMap.get("Id"));
+    //API 取得 lines/tables => this.tables/lines
+    this.mapdatasService.GetMapDataSetsSchema(this.mapId).subscribe(res => {
+      // APT.table => this.tables
+      this.tables = res.Tables.map(x => {
         let cols = [];
-        if (x.schema) {
-          cols = x.schema.split(",");
+        if (x.Schama != null) {
+          cols = x.Schama.split(",");
         }
         return {
-          name: x.name,
-          cols: cols
+          id: x.TableId,
+          name: x.Name,
+          cols: cols,
+          left: x.Left,
+          top: x.Top
         }
       });
-      console.log(this.tables);
-      this.displayTables = this.tables;
+      // 將之前已設計過得資料及加入 this.selectTables
+      this.selectTables = this.tables.filter(x => x.left != null && x.top != null);
+      // 篩選右側可多一資料集
+      this.refreshTables();
+      //API lines => this.lines
+      this.lines = res.Lines;
     })
   }
 
-  ngAfterViewInit() {
+  /** @summary 初始化 jquery flowchart 以及 build 之前已設計好的lines/tables */
+  initialFlowChartAndBuildLastDesign() {
+    // 設計方框
     var container = $('#chart_container');
+    // 設計方框中心 x,y
     this.cx = ($('#exampleDiv') as any).width() / 2;
     this.cy = ($('#exampleDiv') as any).height() / 2;
     ($('#exampleDiv') as any).panzoom({
     });
     ($('#exampleDiv') as any).panzoom('pan', -this.cx + container.width() / 2, -this.cy + container.height() / 2);
 
+    // 放大縮小功能初始
     var possibleZooms = [0.5, 0.75, 1, 2, 3];
     var currentZoom = 2;
     container.on('mousewheel.focal', function (e) {
@@ -73,46 +163,84 @@ export class DatasetJoinEditorComponent implements AfterViewInit, OnInit {
         animate: false,
         focal: e
       });
-
     });
 
-
     setTimeout(() => {
-      ($(this.exampleDiv.nativeElement) as any).flowchart({
-        data: '',
-        multipleLinksOnOutput: false,
-      });
+      this.buildDesignedLinesAndTables();
+    }, 500);
+  }
 
-    }, 1000);
+  /** @summary build 之前已設計好的lines/tables */
+  buildDesignedLinesAndTables() {
+    let links = [];
+    for (let line of this.lines) {
+      links.push({
+        fromConnector: `${line.FromColName}_out`,
+        fromOperator: line.FromTableId,
+        fromSubConnector: 0,
+        toConnector: `${line.ToColName}_in`,
+        toOperator: line.ToTableId
+      })
+    }
+    let tables = {};
+    for (let table of this.selectTables) {
+      var inputs = {};
+      var outputs = {};
+      console.log(table.cols);
+      for (let col of table.cols) {
+        inputs[`${col}_in`] = {};
+        inputs[`${col}_in`]["label"] = col;
+        outputs[`${col}_out`] = {};
+        outputs[`${col}_out`]["label"] = col;
+      }
+      tables[table.id] = {
+        left: table.left,
+        top: table.top,
+        properties: {
+          title: table.name,
+          class: "flowchart-operators",
+          inputs: inputs,
+          outputs: outputs
+        }
+      };
+    }
+    console.log({ links: links, operatorTypes: {}, operators: tables });
+    ($(this.exampleDiv.nativeElement) as any).flowchart({
+      data: { links: links, operatorTypes: {}, operators: tables },
+      multipleLinksOnOutput: false,
+    });
+    $(".flowchart-links-layer").on("dragover", (e) => this.dragover(e));
+    $(".flowchart-links-layer").on("drop", (e) => this.drop(e));
   }
-  refreshTables() {
-    console.log("refresh")
-    console.log(this.selectTables);
-    console.log(this.tables);
-    this.displayTables = this.tables.filter(x => !this.selectTables.includes(x))
+
+  /** @summary 儲存 已設計的 lines、tables */
+  saveLinesAndTables() {
+    let datas = this.joinHelper.GetDatas($(this.exampleDiv.nativeElement));
+    // console.log(datas)
+    let lines: any[] = [];
+    let tables: { tableId: number, top: number, left: number }[] = [];
+    let linksIds = Object.keys(datas.links);
+    for (let line of linksIds) {
+      let tmp: any = {};
+      // tmp.MapId = this.mapId;
+      tmp.fromTableId = Number(datas.links[line as string].fromOperator);
+      tmp.fromColName = datas.links[line as string].fromConnector.split('_')[0];
+      tmp.toTableId = Number(datas.links[line as string].toOperator);
+      tmp.toColName = datas.links[line as string].toConnector.split('_')[0];
+      lines.push(tmp);
+    }
+    let operatorIds = Object(datas.operators);
+    for (let table in operatorIds) {
+      tables.push({
+        tableId: Number(table),
+        left: datas.operators[table as string].left,
+        top: datas.operators[table as string].top
+      })
+    }
+    // console.log({lines:lines,tables:tables})
+    this.joinLineService.SaveJoinLineAndTables({ mapId: this.mapId, lines: lines, tables: tables }).subscribe(res => {
+      this.openSnackBar("Save Successed!");
+    });
   }
-  addNewOperator() {
-    this.joinHelper.AddOperator($(this.exampleDiv.nativeElement), "test", this.cx, this.cy, []);
-  }
-  deleteOperationOrLink() {
-    let selectTable = this.joinHelper.GetSelectedOperatorId($(this.exampleDiv.nativeElement));
-    this.selectTables = this.selectTables.filter(x => x.name != selectTable);
-    this.refreshTables();
-    this.joinHelper.Delete($(this.exampleDiv.nativeElement));
-  }
-  get() {
-    console.log(this.joinHelper.GetDatas($(this.exampleDiv.nativeElement)))
-  }
-  dragstart(table: any, index: number) {
-    this.table = table;
-    this.index = index;
-  }
-  dragover(ev) {
-    ev.preventDefault();
-  }
-  drop(ev) {
-    this.selectTables.push(this.table);
-    this.refreshTables();
-    this.joinHelper.AddOperator($(this.exampleDiv.nativeElement), this.table.name, this.cx / 2 + ev.pageY, this.cy / 2 + ev.pageX, this.table.cols);
-  }
+  //#endregion 封裝 Method
 }

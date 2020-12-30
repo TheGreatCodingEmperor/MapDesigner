@@ -62,7 +62,7 @@ export class TestComponent implements AfterViewInit {
     }, 1000);
   }
   addNewOperator(){
-    this.joinHelper.AddOperator($(this.exampleDiv.nativeElement),"test",this.cx,this.cy,[]);
+    this.joinHelper.AddOperator($(this.exampleDiv.nativeElement),"","test",this.cx,this.cy,[]);
   }
   deleteOperationOrLink(){
     this.tables.push(this.joinHelper.GetSelectedOperatorId($(this.exampleDiv.nativeElement)));
@@ -80,6 +80,6 @@ export class TestComponent implements AfterViewInit {
   }
   drop(ev){
     this.tables.splice(this.index,1);
-    this.joinHelper.AddOperator($(this.exampleDiv.nativeElement),this.table.name,this.cx/2+ev.pageY,this.cy/2+ev.pageX,this.table.cols);
+    this.joinHelper.AddOperator($(this.exampleDiv.nativeElement),this.table.id,this.table.name,this.cx/2+ev.pageY,this.cy/2+ev.pageX,this.table.cols);
   }
 }

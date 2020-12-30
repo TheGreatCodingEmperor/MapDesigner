@@ -1,8 +1,5 @@
 import * as d3 from 'd3';
-import { contourDensity, json } from 'd3';
 import * as t from "topojson";
-
-import { Bubbles, D3Element, IBubbles, IPath } from '../config-bar/config';
 
 export interface IMapSchema {
     name: string,
@@ -52,6 +49,7 @@ export interface IMapBuilder {
      * @param attrs element 內容參數
      */
     buildPath(code: string, data: any[], tag: string, config: object): any;
+
 }
 export class D3BuildHelper implements IMapBuilder {
     width = 900;
