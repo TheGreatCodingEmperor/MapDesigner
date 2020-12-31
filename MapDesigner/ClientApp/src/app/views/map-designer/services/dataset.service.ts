@@ -9,7 +9,7 @@ export class DatasetService {
 
   constructor(protected http:HttpClient) { }
   GetDatasetList():Observable<any>{
-    return this.http.get(`${this.baseUrl()}/DataSet`);
+    return this.http.get(`${this.baseUrl()}/DataSet/DataSetList`);
   }
   SaveDataset(body:any):Observable<any>{
     return this.http.patch(`${this.baseUrl()}/DataSet`, body);

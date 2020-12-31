@@ -53,12 +53,12 @@ export class DatasetJoinEditorComponent implements AfterViewInit, OnInit {
    * @summary 取得資料、build join ui 畫面
    */
   ngOnInit() {
-    this.getMapIdAndLinesAndTables();
+    // this.getMapIdAndLinesAndTables();
   }
 
   /** @summary 初始化jquery flowchart、 build 已設計畫面 */
   ngAfterViewInit() {
-    this.initialFlowChartAndBuildLastDesign();
+    this.getMapIdAndLinesAndTables();
   }
   //#endregion Main
 
@@ -136,6 +136,7 @@ export class DatasetJoinEditorComponent implements AfterViewInit, OnInit {
       this.refreshTables();
       //API lines => this.lines
       this.lines = res.Lines;
+      this.initialFlowChartAndBuildLastDesign();
     })
   }
 
@@ -165,9 +166,8 @@ export class DatasetJoinEditorComponent implements AfterViewInit, OnInit {
       });
     });
 
-    setTimeout(() => {
-      this.buildDesignedLinesAndTables();
-    }, 500);
+    //根據API tables/lines 畫出關係圖
+    this.buildDesignedLinesAndTables();
   }
 
   /** @summary build 之前已設計好的lines/tables */

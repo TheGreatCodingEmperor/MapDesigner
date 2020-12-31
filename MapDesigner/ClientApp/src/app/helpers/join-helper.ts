@@ -13,14 +13,14 @@ export interface IJoinHelper {
 }
 @Injectable({
     providedIn: 'root'
-  })
+})
 export class JoinHelper implements IJoinHelper {
     /** @summary 新增 table */
     AddOperator(element: any, id: string | number, name: string, cx: number, cy: number, cols: string[]) {
         var operatorId = id;
         let inputs = {}
         let outputs = {};
-        if (cols!=null) {
+        if (cols != null) {
             for (let col of cols) {
                 inputs[`${col}_in`] = {};
                 inputs[`${col}_in`]["label"] = col;

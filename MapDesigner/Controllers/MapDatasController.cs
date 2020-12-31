@@ -50,21 +50,26 @@ namespace MapDesigner.Controllers {
             var projectDataSets = mapSchema.Select (x => x.DataSetId).ToList ();
 
             var result = from table in _efcorHelper.GetList<MapDatas> (_mapContext).Where (x => x.MapId == mapId)
-                        join ds in _efcorHelper.GetList<DataSet> (_mapContext)
-                        on table.DataSetId equals ds.DataSetId
-                        select new {
-                            Name = ds.Name,
-                            TableId = table.Id,
-                            Schama = ds.Schema,
-                            Left = table.Left,
-                            Top = table.Top
-                        };
+            join ds in _efcorHelper.GetList<DataSet> (_mapContext)
+            on table.DataSetId equals ds.DataSetId
+            select new {
+                Name = ds.Name,
+                TableId = table.Id,
+                Schama = ds.Schema,
+                Left = table.Left,
+                Top = table.Top
+            };
 
-            var schemas = _efcorHelper.GetList<DataSet> (_mapContext).Where (x => projectDataSets.Contains (x.DataSetId)).ToList ();
+            var schemas = _efcorHelper.GetList<DataSet> (_mapContext).Where (x => projectDataSets.Contains (x.DataSetId)).Select(x => new DataSet(){
+                Name = x.Name,
+                DataSetId = x.DataSetId,
+                Schema = x.Schema,
+                DataType = x.DataType
+            }).ToList ();
 
-            var lines = _efcorHelper.GetList<JoinLines>(_mapContext).Where(x=>x.MapId == mapId).ToList();
+            var lines = _efcorHelper.GetList<JoinLines> (_mapContext).Where (x => x.MapId == mapId).ToList ();
             await Task.CompletedTask;
-            return Ok (JsonConvert.SerializeObject (new{Tables = result,Lines = lines}, Formatting.Indented));
+            return Ok (JsonConvert.SerializeObject (new { Tables = result, Lines = lines }, Formatting.Indented));
         }
 
         [HttpPost ("innerJoin")]
@@ -87,12 +92,21 @@ namespace MapDesigner.Controllers {
 
         [HttpPost ("DataSet/MultiJoin")]
         public async Task<IActionResult> DataSetMultiJoin ([FromBody] DataSetJoinQuery body) {
-            var dataSetIds = _efcorHelper.GetList<MapDatas> (_mapContext).Where (x => x.MapId == body.MapId).AsNoTracking ().Select (x => x.DataSetId).ToList ();
-            var dataSets = _efcorHelper.GetList<DataSet> (_mapContext).Where (x => dataSetIds.Contains (x.DataSetId) && x.DataType != 1).AsNoTracking ().ToList ();
+            // var projectDatasets = _efcorHelper.GetList<MapDatas> (_mapContext).Where (x => x.MapId == body.MapId).AsNoTracking ().ToList ();
+            // var dataSetIds = projectDatasets.Select (x => x.DataSetId).ToList ();
+            // var dataSets = _efcorHelper.GetList<DataSet> (_mapContext).Where (x => dataSetIds.Contains (x.DataSetId) && x.DataType != 1).AsNoTracking ().ToList ();
+            var query = from mapdata in _efcorHelper.GetList<MapDatas> (_mapContext).Where (x => x.MapId == body.MapId)
+            join dataset in _efcorHelper.GetList<DataSet> (_mapContext).Where (x => x.DataType != 1)
+            on mapdata.DataSetId equals dataset.DataSetId
+            select new { mapData = mapdata, dataSet = dataset };
+
             var datas = new Dictionary<string, List<Dictionary<string, object>>> ();
-            foreach (var data in dataSets) {
-                if (data.DataType != 1)
-                    datas[data.Name] = JsonConvert.DeserializeObject<List<Dictionary<string, object>>> (data.Data);
+            foreach (var item in query) {
+                datas[item.dataSet.Name] = JsonConvert.DeserializeObject<List<Dictionary<string, object>>> (item.dataSet.Data);
+            }
+            foreach(var line in body.Lines){
+                line.FromeTableName = query.Where(x => x.mapData.Id == line.FromTableId).SingleOrDefault()?.dataSet.Name;
+                line.ToTableName = query.Where(x => x.mapData.Id == line.ToTableId).SingleOrDefault()?.dataSet.Name;
             }
             var result = _mapDesignHelper.MultiJoin (datas, body.Lines);
             if (result.Status != 200) {

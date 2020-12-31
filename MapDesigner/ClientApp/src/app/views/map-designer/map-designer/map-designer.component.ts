@@ -20,9 +20,11 @@ import { MatDrawer } from '@angular/material/sidenav';
   styleUrls: ['./map-designer.component.css']
 })
 export class MapDesignerComponent implements OnInit {
-  private mapBuilder = new D3BuildHelper;
+  /** @summary 所有 svg elment、method 容器 */
   map = {};
+  /** @summary 放大倍率 */
   k = 3;
+  /** @summary  */
   width = document.querySelector(".container").clientWidth;
   height = window.innerHeight * 0.7;
   mapSchema = [];
@@ -38,7 +40,9 @@ export class MapDesignerComponent implements OnInit {
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private mapSchemaService: MapSchemaService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    /** @summary d3.js methods */
+    private mapBuilder: D3BuildHelper
   ) {
 
   }
@@ -148,8 +152,9 @@ export class MapDesignerComponent implements OnInit {
       .select("#map")
       .append("svg")
       .attr("id", "svgmap")
-      .style("width", this.width)
-      .style("height", this.height)
+      .attr("viewBox",`0 0 500 350`)
+      // .style("width", this.width)
+      // .style("height", this.height)
       // .attr("width", this.width)
       // .attr("height", this.height)
       .style("fill", config.attrs.fill)
